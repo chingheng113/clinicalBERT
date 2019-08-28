@@ -838,7 +838,7 @@ if __name__ == "__main__":
         train_batch_size=32,
         eval_batch_size=32,
         learning_rate=5e-5,
-        num_train_epochs=6.0,
+        num_train_epochs=10.0,
         warmup_proportion=0.1,
         no_cuda=False,
         local_rank=-1,
