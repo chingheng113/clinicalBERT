@@ -527,7 +527,6 @@ def main(args):
     if os.path.exists(args.output_dir) and os.listdir(args.output_dir) and args.do_train:
         raise ValueError("Output directory ({}) already exists and is not empty.".format(args.output_dir))
     if not os.path.exists(args.output_dir):
-        print(':::::::'+args.output_dir)
         os.makedirs(args.output_dir)
 
     task_name = args.task_name.lower()
@@ -839,7 +838,7 @@ if __name__ == "__main__":
         train_batch_size=32,
         eval_batch_size=32,
         learning_rate=5e-5,
-        num_train_epochs=3.0,
+        num_train_epochs=6.0,
         warmup_proportion=0.1,
         no_cuda=False,
         local_rank=-1,
