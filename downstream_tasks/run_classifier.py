@@ -41,6 +41,8 @@ from pytorch_pretrained_bert.optimization import BertAdam, warmup_linear
 import json
 from random import shuffle
 import math
+import os
+current_path = os.path.dirname(__file__)
 
 logging.basicConfig(format = '%(asctime)s - %(levelname)s - %(name)s -   %(message)s',
                     datefmt = '%m/%d/%Y %H:%M:%S',
@@ -191,6 +193,11 @@ class ColaProcessor(DataProcessor):
         """See base class."""
         return self._create_examples(
             self._read_tsv(os.path.join(data_dir, "dev.tsv")), "dev")
+    # hacked ...
+    def get_test_examples(self, data_dir):
+        """See base class."""
+        return self._create_examples(
+            self._read_tsv(os.path.join(data_dir, "dev.tsv")), "test")
 
     def get_labels(self):
         """See base class."""
@@ -459,9 +466,9 @@ def setup_parser():
     parser.add_argument('--model_loc', type=str, default='', help="Specify the location of the bio or clinical bert model")
     return parser
 
-def main():
-    parser = setup_parser()
-    args = parser.parse_args()
+def main(args):
+    # parser = setup_parser()
+    # args = parser.parse_args()
 
     # specifies the path where the biobert or clinical bert model is saved
     if args.bert_model == 'biobert' or args.bert_model == 'clinical_bert':
@@ -783,5 +790,65 @@ def main():
                     logger.info("  %s = %s", key, str(result[key]))
                     writer.write("%s = %s\n" % (key, str(result[key])))
 
+class Hacked_arg:
+    def __init__(self, data_dir, bert_model, task_name, output_dir, cache_dir, max_seq_length,
+                 do_train, do_eval, do_test, do_lower_case, train_batch_size, eval_batch_size,
+                 learning_rate, num_train_epochs, warmup_proportion, no_cuda, local_rank, seed,
+                 gradient_accumulation_steps, fp16, loss_scale, server_ip, server_port, model_loc):
+        self.data_dir = data_dir
+        self.bert_model = bert_model
+        self.task_name = task_name
+        self.output_dir = output_dir
+        self.cache_dir = cache_dir
+        self.max_seq_length = max_seq_length
+        self.do_train = do_train
+        self.do_eval = do_eval
+        self.do_test = do_test
+        self.do_lower_case = do_lower_case
+        self.train_batch_size = train_batch_size
+        self.eval_batch_size = eval_batch_size
+        self.learning_rate = learning_rate
+        self.num_train_epochs = num_train_epochs
+        self.warmup_proportion = warmup_proportion
+        self.no_cuda = no_cuda
+        self.local_rank = local_rank
+        self.seed = seed
+        self.gradient_accumulation_steps = gradient_accumulation_steps
+        self.fp16 = fp16
+        self.loss_scale = loss_scale
+        self.server_ip = server_ip
+        self.server_port = server_port
+        self.model_loc = model_loc
+
+
+
 if __name__ == "__main__":
-    main()
+    print(current_path)
+    hacked_arg = Hacked_arg(
+        data_dir=current_path,
+        bert_model='clinical_bert',
+        task_name='cola',
+        output_dir=current_path,
+        cache_dir='',
+        max_seq_length=128,
+        do_train=True,
+        do_eval=True,
+        do_test=True,
+        do_lower_case=False,
+        train_batch_size=32,
+        eval_batch_size=32,
+        learning_rate=5e-5,
+        num_train_epochs=3.0,
+        warmup_proportion=0.1,
+        no_cuda=False,
+        local_rank=-1,
+        seed=369,
+        gradient_accumulation_steps=1,
+        fp16=False,
+        loss_scale=0,
+        server_ip='',
+        server_port='',
+        model_loc=os.path.join(current_path, 'biobert_pretrain_output_all_notes_150000')
+    )
+
+    main(hacked_arg)
