@@ -527,6 +527,7 @@ def main(args):
     if os.path.exists(args.output_dir) and os.listdir(args.output_dir) and args.do_train:
         raise ValueError("Output directory ({}) already exists and is not empty.".format(args.output_dir))
     if not os.path.exists(args.output_dir):
+        print(':::::::'+args.output_dir)
         os.makedirs(args.output_dir)
 
     task_name = args.task_name.lower()
