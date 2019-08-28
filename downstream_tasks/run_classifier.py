@@ -828,7 +828,7 @@ if __name__ == "__main__":
         data_dir=current_path,
         bert_model='clinical_bert',
         task_name='cola',
-        output_dir=current_path,
+        output_dir=os.path.join(current_path, 'output'),
         cache_dir='',
         max_seq_length=128,
         do_train=True,
