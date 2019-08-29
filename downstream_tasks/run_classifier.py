@@ -20,7 +20,7 @@ from __future__ import absolute_import, division, print_function
 import argparse
 import csv
 import logging
-import os
+import pickle
 import random
 import sys
 
@@ -34,9 +34,10 @@ from tqdm import tqdm, trange
 
 from pytorch_pretrained_bert.file_utils import PYTORCH_PRETRAINED_BERT_CACHE
 from pytorch_pretrained_bert.modeling import BertForSequenceClassification, BertConfig, WEIGHTS_NAME, CONFIG_NAME
+from pytorch_pretrained_bert.modeling import BertModel, PreTrainedBertModel
 from pytorch_pretrained_bert.tokenization import BertTokenizer
 from pytorch_pretrained_bert.optimization import BertAdam, warmup_linear
-
+from torch.nn import BCEWithLogitsLoss
 #added
 import json
 from random import shuffle
@@ -239,9 +240,6 @@ class MedNLIProcessor(DataProcessor):
         file_path = os.path.join(data_dir, "mli_test_v1.jsonl")
         return self._create_examples(file_path)
 
-
-
-
     def get_labels(self):
         """See base class."""
         return ["contradiction", "entailment", "neutral"]
@@ -257,6 +255,84 @@ class MedNLIProcessor(DataProcessor):
                         text_b=example['sentence2'], label=example['gold_label']))
 
         return examples
+
+# Ching-Heng ====================
+class BertForMultiLabelSequenceClassification(PreTrainedBertModel):
+    """BERT model for classification.
+    This module is composed of the BERT model with a linear layer on top of
+    the pooled output.
+    """
+
+    def __init__(self, config, num_labels=2):
+        super(BertForMultiLabelSequenceClassification, self).__init__(config)
+        self.num_labels = num_labels
+        self.bert = BertModel(config)
+        self.dropout = torch.nn.Dropout(config.hidden_dropout_prob)
+        self.classifier = torch.nn.Linear(config.hidden_size, num_labels)
+        self.apply(self.init_bert_weights)
+
+    def forward(self, input_ids, token_type_ids=None, attention_mask=None, labels=None):
+        _, pooled_output = self.bert(input_ids, token_type_ids, attention_mask, output_all_encoded_layers=False)
+        pooled_output = self.dropout(pooled_output)
+        logits = self.classifier(pooled_output)
+
+        if labels is not None:
+            loss_fct = BCEWithLogitsLoss()
+            loss = loss_fct(logits.view(-1, self.num_labels), labels.view(-1, self.num_labels))
+            return loss
+        else:
+            return logits
+
+    def freeze_bert_encoder(self):
+        for param in self.bert.parameters():
+            param.requires_grad = False
+
+    def unfreeze_bert_encoder(self):
+        for param in self.bert.parameters():
+            param.requires_grad = True
+
+
+class CaroditProcessor(DataProcessor):
+    def read_variable(self, open_path):
+        with open(open_path, 'rb') as file_pi:
+            val = pickle.load(file_pi)
+            return val
+
+    def get_train_examples(self, data_dir):
+        """Gets a collection of `InputExample`s for the train set."""
+        file_path = os.path.join(data_dir, "training_bert.pickle")
+        return self._create_examples(file_path)
+
+    def get_dev_examples(self, data_dir):
+        """See base class."""
+        file_path = os.path.join(data_dir, "test_bert.pickle")
+        return self._create_examples(file_path)
+
+    def get_test_examples(self, data_dir):
+        """Gets a collection of `InputExample`s for the test set."""
+        file_path = os.path.join(data_dir, "test_bert.pickle")
+        return self._create_examples(file_path)
+
+    def get_labels(self):
+        """See base class."""
+        return ["0", "1"]
+        # return ['RCCA', 'REICA', 'RIICA', 'RACA', 'RMCA', 'RPCA', 'REVA', 'RIVA', 'BA', 'LCCA', 'LEICA', 'LIICA',
+        #         'LACA', 'LMCA', 'LPCA', 'LEVA', 'LIVA']
+
+    def _create_examples(self, data_dir):
+        examples = []
+        gid = 0
+        data = self.read_variable(data_dir)
+        X = data[0]
+        Y = data[1]
+        for x, y in zip(X, Y):
+            guid = "guid-%s" % (gid)
+            examples.append(
+                InputExample(guid=guid, text_a=x, text_b=None, label=y))
+            gid += 1
+        return examples
+
+# =========================
 
 
 def convert_examples_to_features(examples, label_list, max_seq_length, tokenizer):
@@ -487,14 +563,16 @@ def main(args):
         "cola": ColaProcessor,
         "mnli": MnliProcessor,
         "mrpc": MrpcProcessor,
-        "mednli": MedNLIProcessor
+        "mednli": MedNLIProcessor,
+        "carodit": CaroditProcessor
     }
 
     num_labels_task = {
         "cola": 2,
         "mnli": 3,
         "mrpc": 2,
-        "mednli": 3
+        "mednli": 3,
+        "carodit": 2
     }
 
     if args.local_rank == -1 or args.no_cuda:
@@ -565,9 +643,17 @@ def main(args):
 
     # Prepare model
     cache_dir = args.cache_dir if args.cache_dir else os.path.join(PYTORCH_PRETRAINED_BERT_CACHE, 'distributed_{}'.format(args.local_rank))
-    model = BertForSequenceClassification.from_pretrained(args.bert_model,
-              cache_dir=cache_dir,
-              num_labels = num_labels)
+    if task_name == 'carotid':
+        # model = BertForMultiLabelSequenceClassification.from_pretrained(args.bert_model,
+        #                                                       cache_dir=cache_dir,
+        #                                                       num_labels=num_labels)
+        model = BertForSequenceClassification.from_pretrained(args.bert_model,
+                                                                        cache_dir=cache_dir,
+                                                                        num_labels=num_labels)
+    else:
+        model = BertForSequenceClassification.from_pretrained(args.bert_model,
+                  cache_dir=cache_dir,
+                  num_labels = num_labels)
     if args.fp16:
         model.half()
     model.to(device)
@@ -674,10 +760,18 @@ def main(args):
 
         # Load a trained model and config that you have fine-tuned
         config = BertConfig(output_config_file)
-        model = BertForSequenceClassification(config, num_labels=num_labels)
+        if task_name == 'carotid':
+            # model = BertForMultiLabelSequenceClassification(config, num_labels=num_labels)
+            model = BertForSequenceClassification(config, num_labels=num_labels)
+        else:
+            model = BertForSequenceClassification(config, num_labels=num_labels)
         model.load_state_dict(torch.load(output_model_file))
     else:
-        model = BertForSequenceClassification.from_pretrained(args.bert_model, num_labels=num_labels)
+        if task_name == 'carotid':
+            # model = BertForMultiLabelSequenceClassification.from_pretrained(args.bert_model, num_labels=num_labels)
+            model = BertForSequenceClassification.from_pretrained(args.bert_model, num_labels=num_labels)
+        else:
+            model = BertForSequenceClassification.from_pretrained(args.bert_model, num_labels=num_labels)
     model.to(device)
 
     if args.do_eval and (args.local_rank == -1 or torch.distributed.get_rank() == 0):
@@ -827,12 +921,12 @@ if __name__ == "__main__":
     hacked_arg = Hacked_arg(
         data_dir=current_path,
         bert_model='clinical_bert',
-        task_name='cola',
+        task_name='carodit',
         output_dir=os.path.join(current_path, 'output'),
         cache_dir='',
         max_seq_length=128,
         do_train=True,
-        do_eval=True,
+        do_eval=False,
         do_test=True,
         do_lower_case=False,
         train_batch_size=32,
