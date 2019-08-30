@@ -924,7 +924,7 @@ if __name__ == "__main__":
         task_name='carodit',
         output_dir=os.path.join(current_path, 'output'),
         cache_dir='',
-        max_seq_length=400,
+        max_seq_length=150,
         do_train=True,
         do_eval=False,
         do_test=True,
