@@ -857,6 +857,8 @@ def main(args):
             fpr["micro"], tpr["micro"], _ = roc_curve(all_labels.ravel(), all_logits.ravel())
             roc_auc["micro"] = auc(fpr["micro"], tpr["micro"])
 
+
+
             result = {'eval_loss': eval_loss,
                       'roc_auc': roc_auc}
         else:
