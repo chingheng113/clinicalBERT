@@ -38,6 +38,7 @@ from pytorch_pretrained_bert.modeling import BertModel, PreTrainedBertModel
 from pytorch_pretrained_bert.tokenization import BertTokenizer
 from pytorch_pretrained_bert.optimization import BertAdam, warmup_linear
 from torch.nn import BCEWithLogitsLoss
+from sklearn.metrics import roc_curve, auc
 #added
 import json
 from random import shuffle
@@ -315,9 +316,9 @@ class CaroditProcessor(DataProcessor):
 
     def get_labels(self):
         """See base class."""
-        return ["0", "1"]
-        # return ['RCCA', 'REICA', 'RIICA', 'RACA', 'RMCA', 'RPCA', 'REVA', 'RIVA', 'BA', 'LCCA', 'LEICA', 'LIICA',
-        #         'LACA', 'LMCA', 'LPCA', 'LEVA', 'LIVA']
+        # return ["0", "1"]
+        return ['RCCA', 'REICA', 'RIICA', 'RACA', 'RMCA', 'RPCA', 'REVA', 'RIVA', 'BA', 'LCCA', 'LEICA', 'LIICA',
+                'LACA', 'LMCA', 'LPCA', 'LEVA', 'LIVA']
 
     def _create_examples(self, data_dir):
         examples = []
@@ -335,7 +336,7 @@ class CaroditProcessor(DataProcessor):
 # =========================
 
 
-def convert_examples_to_features(examples, label_list, max_seq_length, tokenizer):
+def convert_examples_to_features(examples, label_list, max_seq_length, tokenizer, task_name):
     """Loads a data file into a list of `InputBatch`s."""
 
     label_map = {label : i for i, label in enumerate(label_list)}
@@ -403,7 +404,13 @@ def convert_examples_to_features(examples, label_list, max_seq_length, tokenizer
         assert len(input_mask) == max_seq_length
         assert len(segment_ids) == max_seq_length
 
-        label_id = label_map[example.label]
+        if task_name == 'carotid':
+            label_id = []
+            for label in example.label:
+                label_id.append(float(label))
+        else:
+            label_id = label_map[example.label]
+
         if ex_index < 3:
             logger.info("*** Example ***")
             logger.info("guid: %s" % (example.guid))
@@ -413,7 +420,10 @@ def convert_examples_to_features(examples, label_list, max_seq_length, tokenizer
             logger.info("input_mask: %s" % " ".join([str(x) for x in input_mask]))
             logger.info(
                     "segment_ids: %s" % " ".join([str(x) for x in segment_ids]))
-            logger.info("label: %s (id = %d)" % (example.label, label_id))
+            if task_name == 'carotid':
+                logger.info("label: %s (id = %s)" % (example.label, label_id))
+            else:
+                logger.info("label: %s (id = %d)" % (example.label, label_id))
 
         features.append(
                 InputFeatures(input_ids=input_ids,
@@ -564,7 +574,7 @@ def main(args):
         "mnli": MnliProcessor,
         "mrpc": MrpcProcessor,
         "mednli": MedNLIProcessor,
-        "carodit": CaroditProcessor
+        "carotid": CaroditProcessor
     }
 
     num_labels_task = {
@@ -572,7 +582,7 @@ def main(args):
         "mnli": 3,
         "mrpc": 2,
         "mednli": 3,
-        "carodit": 2
+        "carotid": 17
     }
 
     if args.local_rank == -1 or args.no_cuda:
@@ -644,12 +654,12 @@ def main(args):
     # Prepare model
     cache_dir = args.cache_dir if args.cache_dir else os.path.join(PYTORCH_PRETRAINED_BERT_CACHE, 'distributed_{}'.format(args.local_rank))
     if task_name == 'carotid':
-        # model = BertForMultiLabelSequenceClassification.from_pretrained(args.bert_model,
-        #                                                       cache_dir=cache_dir,
-        #                                                       num_labels=num_labels)
-        model = BertForSequenceClassification.from_pretrained(args.bert_model,
-                                                                        cache_dir=cache_dir,
-                                                                        num_labels=num_labels)
+        model = BertForMultiLabelSequenceClassification.from_pretrained(args.bert_model,
+                                                              cache_dir=cache_dir,
+                                                              num_labels=num_labels)
+        # model = BertForSequenceClassification.from_pretrained(args.bert_model,
+        #                                                                 cache_dir=cache_dir,
+        #                                                                 num_labels=num_labels)
     else:
         model = BertForSequenceClassification.from_pretrained(args.bert_model,
                   cache_dir=cache_dir,
@@ -701,7 +711,7 @@ def main(args):
     tr_loss = 0
     if args.do_train:
         train_features = convert_examples_to_features(
-            train_examples, label_list, args.max_seq_length, tokenizer)
+            train_examples, label_list, args.max_seq_length, tokenizer, task_name)
         logger.info("***** Running training *****")
         logger.info("  Num examples = %d", len(train_examples))
         logger.info("  Batch size = %d", args.train_batch_size)
@@ -709,7 +719,10 @@ def main(args):
         all_input_ids = torch.tensor([f.input_ids for f in train_features], dtype=torch.long)
         all_input_mask = torch.tensor([f.input_mask for f in train_features], dtype=torch.long)
         all_segment_ids = torch.tensor([f.segment_ids for f in train_features], dtype=torch.long)
-        all_label_ids = torch.tensor([f.label_id for f in train_features], dtype=torch.long)
+        if task_name == 'carotid':
+            all_label_ids = torch.tensor([f.label_id for f in train_features], dtype=torch.float)
+        else:
+            all_label_ids = torch.tensor([f.label_id for f in train_features], dtype=torch.long)
         train_data = TensorDataset(all_input_ids, all_input_mask, all_segment_ids, all_label_ids)
         if args.local_rank == -1:
             train_sampler = RandomSampler(train_data)
@@ -761,15 +774,15 @@ def main(args):
         # Load a trained model and config that you have fine-tuned
         config = BertConfig(output_config_file)
         if task_name == 'carotid':
-            # model = BertForMultiLabelSequenceClassification(config, num_labels=num_labels)
-            model = BertForSequenceClassification(config, num_labels=num_labels)
+            model = BertForMultiLabelSequenceClassification(config, num_labels=num_labels)
+            # model = BertForSequenceClassification(config, num_labels=num_labels)
         else:
             model = BertForSequenceClassification(config, num_labels=num_labels)
         model.load_state_dict(torch.load(output_model_file))
     else:
         if task_name == 'carotid':
-            # model = BertForMultiLabelSequenceClassification.from_pretrained(args.bert_model, num_labels=num_labels)
-            model = BertForSequenceClassification.from_pretrained(args.bert_model, num_labels=num_labels)
+            model = BertForMultiLabelSequenceClassification.from_pretrained(args.bert_model, num_labels=num_labels)
+            # model = BertForSequenceClassification.from_pretrained(args.bert_model, num_labels=num_labels)
         else:
             model = BertForSequenceClassification.from_pretrained(args.bert_model, num_labels=num_labels)
     model.to(device)
@@ -777,18 +790,25 @@ def main(args):
     if args.do_eval and (args.local_rank == -1 or torch.distributed.get_rank() == 0):
         eval_examples = processor.get_dev_examples(args.data_dir)
         eval_features = convert_examples_to_features(
-            eval_examples, label_list, args.max_seq_length, tokenizer)
+            eval_examples, label_list, args.max_seq_length, tokenizer, task_name)
         logger.info("***** Running evaluation *****")
         logger.info("  Num examples = %d", len(eval_examples))
         logger.info("  Batch size = %d", args.eval_batch_size)
         all_input_ids = torch.tensor([f.input_ids for f in eval_features], dtype=torch.long)
         all_input_mask = torch.tensor([f.input_mask for f in eval_features], dtype=torch.long)
         all_segment_ids = torch.tensor([f.segment_ids for f in eval_features], dtype=torch.long)
-        all_label_ids = torch.tensor([f.label_id for f in eval_features], dtype=torch.long)
+        if task_name == 'carotid':
+            all_label_ids = torch.tensor([f.label_id for f in eval_features], dtype=torch.float)
+        else:
+            all_label_ids = torch.tensor([f.label_id for f in eval_features], dtype=torch.long)
+
         eval_data = TensorDataset(all_input_ids, all_input_mask, all_segment_ids, all_label_ids)
         # Run prediction for full data
         eval_sampler = SequentialSampler(eval_data)
         eval_dataloader = DataLoader(eval_data, sampler=eval_sampler, batch_size=args.eval_batch_size)
+
+        all_logits = None
+        all_labels = None
 
         model.eval()
         eval_loss, eval_accuracy = 0, 0
@@ -804,23 +824,49 @@ def main(args):
                 tmp_eval_loss = model(input_ids, segment_ids, input_mask, label_ids)
                 logits = model(input_ids, segment_ids, input_mask)
 
-            logits = logits.detach().cpu().numpy()
-            label_ids = label_ids.to('cpu').numpy()
-            tmp_eval_accuracy = accuracy(logits, label_ids)
+            if task_name == 'carotid':
+                if all_logits is None:
+                    all_logits = logits.detach().cpu().numpy()
+                else:
+                    all_logits = np.concatenate((all_logits, logits.detach().cpu().numpy()), axis=0)
 
-            eval_loss += tmp_eval_loss.mean().item()
-            eval_accuracy += tmp_eval_accuracy
+                if all_labels is None:
+                    all_labels = label_ids.detach().cpu().numpy()
+                else:
+                    all_labels = np.concatenate((all_labels, label_ids.detach().cpu().numpy()), axis=0)
+            else:
+                logits = logits.detach().cpu().numpy()
+                label_ids = label_ids.to('cpu').numpy()
 
-            nb_eval_examples += input_ids.size(0)
-            nb_eval_steps += 1
+                tmp_eval_accuracy = accuracy(logits, label_ids)
 
-        eval_loss = eval_loss / nb_eval_steps
-        eval_accuracy = eval_accuracy / nb_eval_examples
-        loss = tr_loss/nb_tr_steps if args.do_train else None
-        result = {'eval_loss': eval_loss,
-                  'eval_accuracy': eval_accuracy,
-                  'global_step': global_step,
-                  'loss': loss}
+                eval_loss += tmp_eval_loss.mean().item()
+                eval_accuracy += tmp_eval_accuracy
+
+                nb_eval_examples += input_ids.size(0)
+                nb_eval_steps += 1
+
+        if task_name == 'carotid':
+            fpr = dict()
+            tpr = dict()
+            roc_auc = dict()
+            for i in range(num_labels):
+                fpr[i], tpr[i], _ = roc_curve(all_labels[:, i], all_logits[:, i])
+                roc_auc[i] = auc(fpr[i], tpr[i])
+            # Compute micro-average ROC curve and ROC area
+            fpr["micro"], tpr["micro"], _ = roc_curve(all_labels.ravel(), all_logits.ravel())
+            roc_auc["micro"] = auc(fpr["micro"], tpr["micro"])
+
+            result = {'eval_loss': eval_loss,
+                      'roc_auc': roc_auc}
+        else:
+            eval_loss = eval_loss / nb_eval_steps
+            eval_accuracy = eval_accuracy / nb_eval_examples
+            loss = tr_loss/nb_tr_steps if args.do_train else None
+            result = {'eval_loss': eval_loss,
+                      'eval_accuracy': eval_accuracy,
+                      'global_step': global_step,
+                      'loss': loss}
 
         output_eval_file = os.path.join(args.output_dir, "eval_results.txt")
         with open(output_eval_file, "w") as writer:
@@ -832,14 +878,17 @@ def main(args):
     if args.do_test and (args.local_rank == -1 or torch.distributed.get_rank() == 0):
             test_examples = processor.get_test_examples(args.data_dir)
             test_features = convert_examples_to_features(
-                test_examples, label_list, args.max_seq_length, tokenizer)
+                test_examples, label_list, args.max_seq_length, tokenizer, task_name)
             logger.info("***** Running testing *****")
             logger.info("  Num examples = %d", len(test_examples))
             logger.info("  Batch size = %d", args.eval_batch_size)
             all_input_ids = torch.tensor([f.input_ids for f in test_features], dtype=torch.long)
             all_input_mask = torch.tensor([f.input_mask for f in test_features], dtype=torch.long)
             all_segment_ids = torch.tensor([f.segment_ids for f in test_features], dtype=torch.long)
-            all_label_ids = torch.tensor([f.label_id for f in test_features], dtype=torch.long)
+            if task_name == 'carotid':
+                all_label_ids = torch.tensor([f.label_id for f in test_features], dtype=torch.float)
+            else:
+                all_label_ids = torch.tensor([f.label_id for f in test_features], dtype=torch.long)
             test_data = TensorDataset(all_input_ids, all_input_mask, all_segment_ids, all_label_ids)
             # Run prediction for full data
             test_sampler = SequentialSampler(test_data)
@@ -917,17 +966,19 @@ class Hacked_arg:
 
 
 if __name__ == "__main__":
+
+    #  cola
     print(current_path)
     hacked_arg = Hacked_arg(
         data_dir=current_path,
         bert_model='clinical_bert',
-        task_name='carodit',
+        task_name='carotid',
         output_dir=os.path.join(current_path, 'output'),
         cache_dir='',
         max_seq_length=150,
-        do_train=True,
-        do_eval=False,
-        do_test=True,
+        do_train=False,
+        do_eval=True,
+        do_test=False,
         do_lower_case=False,
         train_batch_size=24,
         eval_batch_size=24,

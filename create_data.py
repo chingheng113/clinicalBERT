@@ -35,10 +35,13 @@ for index, row in data.iterrows():
                 processed_sentence += sentence+' '
         processed_sentence = re.sub(' +', ' ', processed_sentence)
         text_arr.append(processed_sentence)
-        if sum(label) == 0:
-            label_arr.append('0')
-        else:
-            label_arr.append('1')
+        # multi-babel
+        label_arr.append(label)
+        # binary
+        # if sum(label) == 0:
+        #     label_arr.append('0')
+        # else:
+        #     label_arr.append('1')
 text_arr = np.array(text_arr)
 label_arr = np.array(label_arr)
 # Train, Test split
