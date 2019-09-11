@@ -953,7 +953,7 @@ def main(args):
                 with open(save_path, 'wb') as file_pi:
                     pickle.dump(predic_result, file_pi)
 
-                result = {'test_loss': eval_loss,
+                result = {'test_loss': test_loss,
                           'roc_auc': roc_auc}
             else:
                 test_loss = test_loss / nb_test_steps
