@@ -643,7 +643,7 @@ def main(args):
 
   
     train_examples = None
-    num_train_optimization_steps = None
+    num_train_optimization_steps = -1
     if args.do_train:
         train_examples = processor.get_train_examples(args.data_dir)
         num_train_optimization_steps = int(
@@ -857,7 +857,10 @@ def main(args):
             fpr["micro"], tpr["micro"], _ = roc_curve(all_labels.ravel(), all_logits.ravel())
             roc_auc["micro"] = auc(fpr["micro"], tpr["micro"])
 
-
+            save_path = os.path.join(args.output_dir, "eval_prediction.pickle")
+            predic_result={'all_logits': all_logits, 'all_labels': all_labels}
+            with open(save_path, 'wb') as file_pi:
+                pickle.dump(predic_result, file_pi)
 
             result = {'eval_loss': eval_loss,
                       'roc_auc': roc_auc}
@@ -896,6 +899,9 @@ def main(args):
             test_sampler = SequentialSampler(test_data)
             test_dataloader = DataLoader(test_data, sampler=test_sampler, batch_size=args.eval_batch_size)
 
+            all_logits = None
+            all_labels = None
+
             model.eval()
             test_loss, test_accuracy = 0, 0
             nb_test_steps, nb_test_examples = 0, 0
@@ -910,23 +916,53 @@ def main(args):
                     tmp_test_loss = model(input_ids, segment_ids, input_mask, label_ids)
                     logits = model(input_ids, segment_ids, input_mask)
 
-                logits = logits.detach().cpu().numpy()
-                label_ids = label_ids.to('cpu').numpy()
-                tmp_test_accuracy = accuracy(logits, label_ids)
+                if task_name == 'carotid':
+                    if all_logits is None:
+                        all_logits = logits.detach().cpu().numpy()
+                    else:
+                        all_logits = np.concatenate((all_logits, logits.detach().cpu().numpy()), axis=0)
 
-                test_loss += tmp_test_loss.mean().item()
-                test_accuracy += tmp_test_accuracy
+                    if all_labels is None:
+                        all_labels = label_ids.detach().cpu().numpy()
+                    else:
+                        all_labels = np.concatenate((all_labels, label_ids.detach().cpu().numpy()), axis=0)
+                else:
+                    logits = logits.detach().cpu().numpy()
+                    label_ids = label_ids.to('cpu').numpy()
+                    tmp_test_accuracy = accuracy(logits, label_ids)
 
-                nb_test_examples += input_ids.size(0)
-                nb_test_steps += 1
+                    test_loss += tmp_test_loss.mean().item()
+                    test_accuracy += tmp_test_accuracy
 
-            test_loss = test_loss / nb_test_steps
-            test_accuracy = test_accuracy / nb_test_examples
-            loss = tr_loss/nb_tr_steps if args.do_train else None
-            result = {'test_loss': test_loss,
-                      'test_accuracy': test_accuracy,
-                      'global_step': global_step,
-                      'loss': loss}
+                    nb_test_examples += input_ids.size(0)
+                    nb_test_steps += 1
+
+            if task_name == 'carotid':
+                fpr = dict()
+                tpr = dict()
+                roc_auc = dict()
+                for i in range(num_labels):
+                    fpr[i], tpr[i], _ = roc_curve(all_labels[:, i], all_logits[:, i])
+                    roc_auc[i] = auc(fpr[i], tpr[i])
+                # Compute micro-average ROC curve and ROC area
+                fpr["micro"], tpr["micro"], _ = roc_curve(all_labels.ravel(), all_logits.ravel())
+                roc_auc["micro"] = auc(fpr["micro"], tpr["micro"])
+
+                save_path = os.path.join(args.output_dir, "test_prediction.pickle")
+                predic_result = {'all_logits': all_logits, 'all_labels': all_labels}
+                with open(save_path, 'wb') as file_pi:
+                    pickle.dump(predic_result, file_pi)
+
+                result = {'test_loss': eval_loss,
+                          'roc_auc': roc_auc}
+            else:
+                test_loss = test_loss / nb_test_steps
+                test_accuracy = test_accuracy / nb_test_examples
+                loss = tr_loss/nb_tr_steps if args.do_train else None
+                result = {'test_loss': test_loss,
+                          'test_accuracy': test_accuracy,
+                          'global_step': global_step,
+                          'loss': loss}
 
             output_test_file = os.path.join(args.output_dir, "test_results.txt")
             with open(output_test_file, "w") as writer:
@@ -977,10 +1013,10 @@ if __name__ == "__main__":
         task_name='carotid',
         output_dir=os.path.join(current_path, 'output'),
         cache_dir='',
-        max_seq_length=150,
-        do_train=False,
-        do_eval=True,
-        do_test=False,
+        max_seq_length=400,
+        do_train=True,
+        do_eval=False,
+        do_test=True,
         do_lower_case=False,
         train_batch_size=24,
         eval_batch_size=24,
