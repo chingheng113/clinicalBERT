@@ -654,10 +654,7 @@ def main(args):
     # Prepare model
     cache_dir = args.cache_dir if args.cache_dir else os.path.join(PYTORCH_PRETRAINED_BERT_CACHE, 'distributed_{}'.format(args.local_rank))
     if task_name == 'carotid':
-        # model = BertForMultiLabelSequenceClassification.from_pretrained(args.bert_model,
-        #                                                       cache_dir=cache_dir,
-        #                                                       num_labels=num_labels)
-        model = BertForSequenceClassification.from_pretrained("bert-base-uncased",
+        model = BertForMultiLabelSequenceClassification.from_pretrained(args.bert_model,
                                                               cache_dir=cache_dir,
                                                               num_labels=num_labels)
     else:
@@ -774,15 +771,13 @@ def main(args):
         # Load a trained model and config that you have fine-tuned
         config = BertConfig(output_config_file)
         if task_name == 'carotid':
-            # model = BertForMultiLabelSequenceClassification(config, num_labels=num_labels)
-            model = BertForSequenceClassification(config, num_labels=num_labels)
+            model = BertForMultiLabelSequenceClassification(config, num_labels=num_labels)
         else:
             model = BertForSequenceClassification(config, num_labels=num_labels)
         model.load_state_dict(torch.load(output_model_file))
     else:
         if task_name == 'carotid':
-            # model = BertForMultiLabelSequenceClassification.from_pretrained(args.bert_model, num_labels=num_labels)
-            model = BertForSequenceClassification(config, num_labels=num_labels)
+            model = BertForMultiLabelSequenceClassification.from_pretrained(args.bert_model, num_labels=num_labels)
         else:
             model = BertForSequenceClassification.from_pretrained(args.bert_model, num_labels=num_labels)
     model.to(device)
@@ -1009,7 +1004,8 @@ if __name__ == "__main__":
     print(current_path)
     hacked_arg = Hacked_arg(
         data_dir=current_path,
-        bert_model='clinical_bert',
+        bert_model='bert-large-cased',
+        # bert_model='clinical_bert',
         task_name='carotid',
         output_dir=os.path.join(current_path, 'output'),
         cache_dir='',
