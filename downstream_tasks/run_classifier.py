@@ -1004,7 +1004,7 @@ if __name__ == "__main__":
     print(current_path)
     hacked_arg = Hacked_arg(
         data_dir=current_path,
-        bert_model='bert-large-cased',
+        bert_model='bert-base-cased',
         # bert_model='clinical_bert',
         task_name='carotid',
         output_dir=os.path.join(current_path, 'output'),
@@ -1014,8 +1014,8 @@ if __name__ == "__main__":
         do_eval=False,
         do_test=True,
         do_lower_case=False,
-        train_batch_size=16,
-        eval_batch_size=16,
+        train_batch_size=24,
+        eval_batch_size=24,
         learning_rate=5e-5,
         num_train_epochs=10.0,
         warmup_proportion=0.1,
