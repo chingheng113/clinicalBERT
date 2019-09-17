@@ -3,7 +3,9 @@ from sklearn.metrics import roc_curve, auc, confusion_matrix, classification_rep
 import os
 import pickle
 
-read_path = os.path.join('downstream_tasks', 'output', 'test_prediction.pickle')
+model_name = 'test_prediction(bert).pickle'
+print(model_name)
+read_path = os.path.join('downstream_tasks', 'output', model_name)
 labels = ['RCCA', 'REICA', 'RIICA', 'RACA', 'RMCA', 'RPCA', 'REVA', 'RIVA', 'BA', 'LCCA', 'LEICA', 'LIICA',
           'LACA', 'LMCA', 'LPCA', 'LEVA', 'LIVA']
 with open(read_path, 'rb') as f:

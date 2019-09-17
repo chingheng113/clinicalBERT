@@ -1,18 +1,20 @@
-import psycopg2
+# import psycopg2
 import pandas as pd
-import sys
+import os, sys
 import spacy
 import re
 import stanfordnlp
 import time
-import scispacy
+# import scispacy
 from tqdm import tqdm
-from heuristic_tokenize import sent_tokenize_rules 
+from lm_pretraining import heuristic_tokenize
+# from heuristic_tokenize import sent_tokenize_rules
+current_path = os.path.dirname(__file__)
 
 
 # update these constants to run this script
-OUTPUT_DIR = '/PATH/TO/OUTPUT/DIR' #this path will contain tokenized notes. This dir will be the input dir for create_pretrain_data.sh
-MIMIC_NOTES_FILE = 'PATH/TO/MIMIC/DATA' #this is the path to mimic data if you're reading from a csv. Else uncomment the code to read from database below
+OUTPUT_DIR = os.path.join(current_path, 'lm_pretraining') #this path will contain tokenized notes. This dir will be the input dir for create_pretrain_data.sh
+MIMIC_NOTES_FILE = 'NOTEEVENTS.csv' #this is the path to mimic data if you're reading from a csv. Else uncomment the code to read from database below
 
 
 #setting sentence boundaries
@@ -45,7 +47,7 @@ def process_section(section, note, processed_sections):
 
 def process_note_helper(note):
     # split note into sections
-    note_sections = sent_tokenize_rules(note)
+    note_sections = heuristic_tokenize.sent_tokenize_rules(note)
     processed_sections = []
     section_frame = pd.DataFrame({'sections':note_sections})
     section_frame.apply(process_section, args=(note,processed_sections,), axis=1)
@@ -78,12 +80,12 @@ def process_note(note):
 
 
 
-if len(sys.argv) < 2:
-        print('Please specify the note category.')
-        sys.exit()
+# if len(sys.argv) < 2:
+#         print('Please specify the note category.')
+#         sys.exit()
 
-category = sys.argv[1]
-
+# category = sys.argv[1]
+category = 'Discharge summary'
 
 start = time.time()
 tqdm.pandas()
@@ -96,6 +98,8 @@ print('Begin reading notes')
 # notes_query = "(select * from mimiciii.noteevents);"
 # notes = pd.read_sql_query(notes_query, con)
 notes = pd.read_csv(MIMIC_NOTES_FILE, index_col = 0)
+notes = notes[0:30]
+notes.columns = [x.lower() for x in notes.columns]
 #print(set(notes['category'])) # all categories
 
 
@@ -105,6 +109,7 @@ notes['ind'] = list(range(len(notes.index)))
 
 # NOTE: `disable=['tagger', 'ner'] was added after paper submission to make this process go faster
 # our time estimate in the paper did not include the code to skip spacy's NER & tagger
+# pip install https://s3-us-west-2.amazonaws.com/ai2-s2-scispacy/releases/v0.2.3/en_core_sci_md-0.2.3.tar.gz
 nlp = spacy.load('en_core_sci_md', disable=['tagger','ner'])
 nlp.add_pipe(sbd_component, before='parser')  
 

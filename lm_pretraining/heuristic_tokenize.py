@@ -165,7 +165,7 @@ def sent_tokenize_rules(text):
         # determine whether this segment contains a bulleted list (assumes i,i+1,...,n)
         start = int(re.search('\n\s*(\d+)\.', '\n'+segment).groups()[0])
         n = start
-        while re.search('\n\s*%d.'%n,segment): # SHOULD CHANGE TO: while re.search('\n\s*%d\.'%n,segment): #(CHANGED . to \.)
+        while re.search('\n\s*%d\.'%n,segment): # SHOULD CHANGE TO: while re.search('\n\s*%d\.'%n,segment): #(CHANGED . to \.)
             n += 1
         n -= 1
 
@@ -287,10 +287,12 @@ def sent_tokenize_rules(text):
             if (i == N-1) or is_title(segments[i+1]):
                 new_segments = new_segments[:-1]
                 new_segments.append(segments[i-1] + ' ' + segments[i])
-            #else: new_segments.append(segments[i]) #ADD TO FIX BUG
-            # currently If the code sees a segment that doesn't have any new lines and the prior line is a title 
-            # *but* it is not the last segment and the next segment is not a title then that segment is just dropped
-            # so lists that have a title header will lose their first entry
+            else:
+                new_segments.append(segments[i])
+                #else: new_segments.append(segments[i]) #ADD TO FIX BUG
+                # currently If the code sees a segment that doesn't have any new lines and the prior line is a title
+                # *but* it is not the last segment and the next segment is not a title then that segment is just dropped
+                # so lists that have a title header will lose their first entry
         else:
             new_segments.append(segments[i])
 
