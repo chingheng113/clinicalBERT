@@ -20,7 +20,8 @@ from __future__ import print_function
 
 import collections
 import random
-import tokenization
+#pip install bert-tensorflow
+from bert import tokenization
 import tensorflow as tf
 
 flags = tf.flags
@@ -417,6 +418,7 @@ def main(_):
     input_files.extend(tf.gfile.Glob(input_pattern))
 
   tf.logging.info("*** Reading from input files ***")
+  print('*** %s', len(input_files))
   for input_file in input_files:
     tf.logging.info("  %s", input_file)
 
@@ -436,7 +438,8 @@ def main(_):
 
 
 if __name__ == "__main__":
-  flags.mark_flag_as_required("input_file")
-  flags.mark_flag_as_required("output_file")
-  flags.mark_flag_as_required("vocab_file")
-  tf.app.run()
+    # python create_pretraining_data.py --input_file lm_pretrainingDischarge summary.txt --output_file result.tfrecord --vocab_file=vocab.txt
+    flags.mark_flag_as_required("input_file")
+    flags.mark_flag_as_required("output_file")
+    flags.mark_flag_as_required("vocab_file")
+    tf.app.run()

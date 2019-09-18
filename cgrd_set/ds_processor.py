@@ -14,17 +14,31 @@ selected_cols = ['入院診斷', '出院診斷', '主訴', '病史', '手術日�
 note_1 = pd.read_csv('ds.csv')
 # print(note_1.head())
 nlp = spacy.load('en_core_sci_md', disable=['tagger','ner'])
-regex = re.compile('(^;)|(;;;)|(=+>)|(={2})|(\*{3})')
-for inx, row in note_1.iterrows():
-    for i in range(len(selected_cols)):
-        print(selected_cols[i])
-        parg = str(row[selected_cols[i]])
-        parg= re.sub(regex, '', parg)
-        print(parg)
+with open('ds.txt', 'w', encoding="utf-8") as f:
+    for inx, row in note_1.iterrows():
+        for i in range(len(selected_cols)):
+            print(selected_cols[i])
+            # remove special characters
+            parg = str(row[selected_cols[i]])
+            parg = re.sub(r'(^;)|(;;;)|(=+>)|(={2})|(-+>)|(={2})|(\*{3})', '', parg)
+            # fix bullet points
+            parg = re.sub(r'(\d+[.{1}][\D])', r'. \1', parg)
+            # remove multi-spaces
+            parg = re.sub(' +', ' ', parg)
+            print(parg)
+            # remove Chinese
+            parg = re.sub(r'[\u4e00-\u9fff]+', '', parg)
+            # remove date
+            parg = re.sub(r'\d{2,4}[/]\d{1,2}[/]\d{1,2}', '', parg)
+            sentences = nlp(parg)
+            for sentence in sentences.sents:
+                if len(sentence) > 3:
+                    # remove bullet point number
+                    see_sentence = re.sub(r'(^\d+\.)|(^\s+)', '', sentence.text)
+                    # trim white space at the head and the end
+                    see_sentence = see_sentence.strip()
+                    f.write(see_sentence)
+                    f.write('\n')
+        f.write('\n')
 
-        print('---')
 print('done')
-
-
-
-# ;          ;;;, ;;;, ******,  ==> 2007/07/13
