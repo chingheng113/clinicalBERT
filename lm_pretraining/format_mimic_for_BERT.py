@@ -3,7 +3,7 @@ import pandas as pd
 import os, sys
 import spacy
 import re
-import stanfordnlp
+#import stanfordnlp
 import time
 # import scispacy
 from tqdm import tqdm
