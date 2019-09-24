@@ -437,7 +437,7 @@ def main(_):
 
 
 if __name__ == "__main__":
-    # python create_pretraining_data.py --input_file lm_pretrainingDischarge_summary.txt --output_file result.tfrecord --vocab_file=vocab.txt --max_seq_length=512
+    # python create_pretraining_data.py --input_file ds.txt --output_file ds.tfrecord --vocab_file=vocab.txt
     flags.mark_flag_as_required("input_file")
     flags.mark_flag_as_required("output_file")
     flags.mark_flag_as_required("vocab_file")
