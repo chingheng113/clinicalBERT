@@ -487,7 +487,7 @@ def main(_):
 
 
 if __name__ == "__main__":
-    # python run_pretraining.py --input_file=result.tfrecord --bert_config_file=../downstream_tasks/biobert_pretrain_output_all_notes_150000/bert_config.json --output_dir=/lm_pretraining/ --do_train=True --max_seq_length=512
+    # python run_stroke_pretraining.py --input_file=result.tfrecord --bert_config_file=../downstream_tasks/biobert_pretrain_output_all_notes_150000/bert_config.json --output_dir=/lm_pretraining/ --do_train=True --max_seq_length=512
     flags.mark_flag_as_required("input_file")
     flags.mark_flag_as_required("bert_config_file")
     flags.mark_flag_as_required("output_dir")
