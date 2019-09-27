@@ -19,11 +19,12 @@
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
-
+import sys
+sys.path.append("..")
 import os
 import time
-import stroke_pretraining.modeling as modeling
-import stroke_pretraining.optimization as optimization
+from stroke_pretraining import modeling
+from stroke_pretraining import optimization
 import tensorflow as tf
 import glob
 

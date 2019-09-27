@@ -17,7 +17,8 @@
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
-
+import sys
+sys.path.append("..")
 import collections
 import copy
 import json
@@ -27,7 +28,7 @@ import numpy as np
 import six
 import tensorflow as tf
 
-import stroke_pretraining.gpu_environment as gpu_environment
+from stroke_pretraining import gpu_environment
 
 class BertConfig(object):
   """Configuration for `BertModel`."""
