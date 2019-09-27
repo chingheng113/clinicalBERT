@@ -437,7 +437,7 @@ def main(_):
 
 
 if __name__ == "__main__":
-    # python create_pretraining_data.py --input_file ds.txt --output_file ds.tfrecord --vocab_file=vocab.txt
+    # python create_pretraining_data.py --input_file ../data/ds.txt --output_file ../data/ds.tfrecord --vocab_file=../data/vocab.txt
     flags.mark_flag_as_required("input_file")
     flags.mark_flag_as_required("output_file")
     flags.mark_flag_as_required("vocab_file")

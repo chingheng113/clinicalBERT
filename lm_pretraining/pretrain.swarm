@@ -1,1 +1,1 @@
-/data/linc9/conda/envs/bert/bin/python3 run_pretraining.py --input_file=ds.tfrecord --bert_config_file=../downstream_tasks/biobert_pretrain_output_all_notes_150000/bert_config.json --output_dir=/data/linc9/clinicalBERT/lm_pretraining/ --do_train=True
+/data/linc9/conda/envs/bert/bin/python3 run_pretraining.py --input_file=../data/ds.tfrecord --bert_config_file=../downstream_tasks/biobert_pretrain_output_all_notes_150000/bert_config.json --output_dir=/data/linc9/clinicalBERT/lm_pretraining/ --do_train=True
