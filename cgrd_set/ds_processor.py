@@ -2,6 +2,7 @@ import spacy
 import re
 import pandas as pd
 import os
+from collections import Counter
 current_path = os.path.dirname(__file__)
 
 
@@ -32,13 +33,15 @@ with open('ds.txt', 'w', encoding="utf-8") as f:
             parg = re.sub(r'\d{2,4}[/]\d{1,2}[/]\d{1,2}', '', parg)
             sentences = nlp(parg)
             for sentence in sentences.sents:
-                if len(sentence) > 3:
-                    # remove bullet point number
-                    see_sentence = re.sub(r'(^\d+\.)|(^\s+)', '', sentence.text)
-                    # trim white space at the head and the end
-                    see_sentence = see_sentence.strip()
-                    f.write(see_sentence)
-                    f.write('\n')
-        f.write('\n')
+                # remove bullet point number
+                see_sentence = re.sub(r'(^\d+\.)|(^\s+)', '', sentence.text)
+                # trim white space at the head and the end
+                see_sentence = see_sentence.strip()
+                # if sentence is very short or doesn't contain any word, remove it!
+                if len(see_sentence.split()) > 2:
+
+                    # f.write(see_sentence)
+                    # f.write('\n')
+        # f.write('\n')
 
 print('done')
