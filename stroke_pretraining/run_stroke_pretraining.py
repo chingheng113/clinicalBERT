@@ -22,8 +22,8 @@ from __future__ import print_function
 
 import os
 import time
-from stroke_pretraining import modeling
-from stroke_pretraining import optimization
+import modeling
+import optimization
 import tensorflow as tf
 import glob
 
