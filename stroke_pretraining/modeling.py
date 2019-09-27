@@ -27,7 +27,7 @@ import numpy as np
 import six
 import tensorflow as tf
 
-import gpu_environment
+import stroke_pretraining.gpu_environment as gpu_environment
 
 class BertConfig(object):
   """Configuration for `BertModel`."""
