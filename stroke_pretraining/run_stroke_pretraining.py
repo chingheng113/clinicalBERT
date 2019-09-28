@@ -23,7 +23,7 @@ import sys
 sys.path.append("..")
 import os
 import time
-from bert import modeling
+from stroke_pretraining import modeling
 from stroke_pretraining import optimization
 import tensorflow as tf
 import glob
@@ -262,9 +262,11 @@ def model_fn_builder(bert_config, init_checkpoint, learning_rate,
 
     output_spec = None
     if mode == tf.estimator.ModeKeys.TRAIN:
+      # train_op = optimization.create_optimizer(
+      #     total_loss, learning_rate, num_train_steps, num_warmup_steps,
+      #     hvd, FLAGS.manual_fp16, FLAGS.use_fp16, FLAGS.num_accumulation_steps, FLAGS.optimizer_type, FLAGS.allreduce_post_accumulation)
       train_op = optimization.create_optimizer(
-          total_loss, learning_rate, num_train_steps, num_warmup_steps,
-          hvd, FLAGS.manual_fp16, FLAGS.use_fp16, FLAGS.num_accumulation_steps, FLAGS.optimizer_type, FLAGS.allreduce_post_accumulation)
+          total_loss, learning_rate, num_train_steps, num_warmup_steps, False)
 
       output_spec = tf.estimator.EstimatorSpec(
           mode=mode,
