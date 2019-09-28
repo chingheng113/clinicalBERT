@@ -512,6 +512,9 @@ def main(_):
   for input_file_dir in FLAGS.input_files_dir.split(","):
     input_files.extend(tf.gfile.Glob(os.path.join(input_file_dir, "*")))
 
+  print('%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
+  print(len(input_files))
+
   if FLAGS.horovod and len(input_files) < hvd.size():
       raise ValueError("Input Files must be sharded")
   if FLAGS.use_fp16 and FLAGS.manual_fp16:
