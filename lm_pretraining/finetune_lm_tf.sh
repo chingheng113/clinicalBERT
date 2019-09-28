@@ -2,6 +2,7 @@
 
 # location of bert or biobert model
 # Note that if you use biobert as your base model, you'll need to change init_checkpoint to be biobert_model.ckpt
+# python3 run_pretraining.py --input_file=/data/linc9/clinicalBERT/data/ds.tfrecord --bert_config_file=/data/linc9/clinicalBERT/downstream_tasks/biobert_v1.0_pubmed_pmc/bert_config.json --init_checkpoint=/data/linc9/clinicalBERT/downstream_tasks/biobert_v1.0_pubmed_pmc/biobert_model.ckpt --output_dir=/data/linc9/clinicalBERT/lm_pretraining/ --do_train=True
 BERT_BASE_DIR=/PATH/TO/BERT/MODEL
 
 # folder where you want to save your clinical BERT model
@@ -18,7 +19,7 @@ LR=5e-5
 # to the tfrecords for all MIMIC sections - e.g.
 # --input_file=../data/tf_records/discharge_summary.tfrecord,../data/tf_records/physician.tfrecord,../data/tf_records/nursing.tfrecord,../data/tf_records/nursing_other.tfrecord,../data/tf_records/radiology.tfrecord,../data/tf_records/general.tfrecord,../data/tf_records/respiratory.tfrecord,../data/tf_records/consult.tfrecord,../data/tf_records/nutrition.tfrecord,../data/tf_records/case_management.tfrecord,../data/tf_records/pharmacy.tfrecord,../data/tf_records/rehab_services.tfrecord,../data/tf_records/social_work.tfrecord,../data/tf_records/ecg.tfrecord,../data/tf_records/echo.tfrecord \
 
-  python run_stroke_pretraining.py \
+  python run_pretraining.py \
   --output_dir=$OUTPUT_DIR \
   --input_file=$INPUT_FILES_DIR/discharge_summary.tfrecord \
   --do_train=True \
@@ -33,5 +34,3 @@ LR=5e-5
   --learning_rate=$LR \
   --save_checkpoints_steps=50000 \
   --keep_checkpoint_max=15
-
-   
