@@ -40,8 +40,8 @@ with open('ds.txt', 'w', encoding="utf-8") as f:
                 # if sentence is very short or doesn't contain any word, remove it!
                 if len(see_sentence.split()) > 2:
                     print(see_sentence)
-                    # f.write(see_sentence)
-                    # f.write('\n')
-        # f.write('\n')
+                    f.write(see_sentence)
+                    f.write('\n')
+        f.write('\n')
 
 print('done')

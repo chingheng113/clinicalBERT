@@ -20,13 +20,13 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 import sys
-sys.path.append("..")
 import os
 import time
-from stroke_pretraining import modeling
+from bert import modeling
 from stroke_pretraining import optimization
 import tensorflow as tf
 import glob
+sys.path.append("..")
 
 flags = tf.flags
 
@@ -512,8 +512,6 @@ def main(_):
   for input_file_dir in FLAGS.input_files_dir.split(","):
     input_files.extend(tf.gfile.Glob(os.path.join(input_file_dir, "*")))
 
-  print('%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
-  print(len(input_files))
 
   if FLAGS.horovod and len(input_files) < hvd.size():
       raise ValueError("Input Files must be sharded")
