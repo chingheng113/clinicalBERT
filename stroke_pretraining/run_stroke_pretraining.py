@@ -56,7 +56,7 @@ flags.DEFINE_string(
     "Initial checkpoint (usually from a pre-trained BERT model).")
 
 flags.DEFINE_string(
-    "optimizer_type", "lamb",
+    "optimizer_type", "LAMB",
     "Optimizer used for training - LAMB or ADAM")
 
 flags.DEFINE_integer(
