@@ -24,7 +24,7 @@ sys.path.append("..")
 import os
 import time
 from stroke_pretraining import modeling
-from stroke_pretraining import optimization
+from bert import optimization
 import tensorflow as tf
 import glob
 
