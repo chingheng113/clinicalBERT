@@ -231,11 +231,11 @@ def model_fn_builder(bert_config, init_checkpoint, learning_rate,
          bert_config, model.get_sequence_output(), model.get_embedding_table(), 
          masked_lm_positions, masked_lm_ids, 
          masked_lm_weights)
-    print("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
+
     (next_sentence_loss, next_sentence_example_loss,
      next_sentence_log_probs) = get_next_sentence_output(
          bert_config, model.get_pooled_output(), next_sentence_labels)
-    print("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
+
     masked_lm_loss = tf.identity(masked_lm_loss, name="mlm_loss")
     next_sentence_loss = tf.identity(next_sentence_loss, name="nsp_loss")
     total_loss = masked_lm_loss + next_sentence_loss
@@ -261,6 +261,7 @@ def model_fn_builder(bert_config, init_checkpoint, learning_rate,
 
     output_spec = None
     if mode == tf.estimator.ModeKeys.TRAIN:
+      print("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
       train_op = optimization.create_optimizer(
           total_loss, learning_rate, num_train_steps, num_warmup_steps,
           hvd, FLAGS.manual_fp16, FLAGS.use_fp16, FLAGS.num_accumulation_steps, FLAGS.optimizer_type, FLAGS.allreduce_post_accumulation)
