@@ -500,5 +500,5 @@ def main():
 
 
 if __name__ == "__main__":
-    # python create_stroke_pretraining_data.py --input_file=../data/ds.txt --output_file=../data/ds.tfrecord --vocab_file=../data/vocab.txt
+    # python create_stroke_pretraining_data.py --input_file=../cgrd_set/ds.txt --output_file=../data/ds.tfrecord --vocab_file=../cgrd_set/vocab.txt --max_seq_length=128
     main()
