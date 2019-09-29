@@ -179,7 +179,7 @@ def model_fn_builder(bert_config, init_checkpoint, learning_rate,
       #     total_loss, learning_rate, num_train_steps, num_warmup_steps, use_tpu)
       train_op = optimization.create_optimizer(
           total_loss, learning_rate, num_train_steps, num_warmup_steps,
-          '', False, False, 128, 'lamb', True)
+          None, False, False, 128, 'lamb', True)
 
 
       output_spec = tf.contrib.tpu.TPUEstimatorSpec(
