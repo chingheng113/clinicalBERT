@@ -5,20 +5,23 @@ import os
 from collections import Counter
 current_path = os.path.dirname(__file__)
 
+selected_cols = ['主訴', '病史', '手術日期、方法及發現', '住院治療經過']
 
-note_1 = pd.read_csv('14653_出院病摘_1.csv')
-# print(note_1.columns.values)
-selected_cols = ['入院診斷', '出院診斷', '主訴', '病史', '手術日期、方法及發現', '住院治療經過']
-note_1 = note_1[selected_cols]
-note_1 = note_1[0:100]
+# select patients
+note_icd9 = pd.read_csv('14653_出院病摘_1_icd9.csv')
+print(note_icd9.shape)
+selected_ids_icd9 = pd.read_csv('selected_ID_icd9_stroke.csv')
+note_icd9 = pd.merge(note_icd9, selected_ids_icd9, on=['院區', '資料年月', '歸戶代號'])
+print(note_icd9.shape)
+note_icd9 = note_icd9[selected_cols]
+#
+# note_icd9 = note_icd9[0:100]
 
-# note_1 = pd.read_csv('ds.csv')
-# print(note_1.head())
 nlp = spacy.load('en_core_sci_md', disable=['tagger','ner'])
-with open('ds.txt', 'w', encoding="utf-8") as f:
-    for inx, row in note_1.iterrows():
+with open('../data/ds.txt', 'w', encoding="utf-8") as f:
+    for inx, row in note_icd9.iterrows():
         for i in range(len(selected_cols)):
-            print(selected_cols[i])
+            # print(selected_cols[i])
             parg = str(row[selected_cols[i]])
             # remove special characters
             parg = re.sub(r'(^;)|(;;;)|(=+>)|(={2})|(-+>)|(={2})|(\*{3})', '', parg)
@@ -26,7 +29,7 @@ with open('ds.txt', 'w', encoding="utf-8") as f:
             parg = re.sub(r'(\d+[.{1}][\D])', r'. \1', parg)
             # remove multi-spaces
             parg = re.sub(' +', ' ', parg)
-            print(parg)
+            # print(parg)
             # remove Chinese
             parg = re.sub(r'[\u4e00-\u9fff]+', '', parg)
             # remove date
@@ -37,11 +40,12 @@ with open('ds.txt', 'w', encoding="utf-8") as f:
                 see_sentence = re.sub(r'(^\d+\.)|(^\s+)', '', sentence.text)
                 # trim white space at the head and the end
                 see_sentence = see_sentence.strip()
-                # if sentence is very short or doesn't contain any word, remove it!
-                if len(see_sentence.split()) > 2:
-                    print(see_sentence)
-                    f.write(see_sentence)
-                    f.write('\n')
+                # if the sentence is very short or doesn't contain any word or start with non-character, remove it!
+                if not ((len(see_sentence.split()) < 3) | (see_sentence == 'nil') | (len(re.findall(r'[a-zA-Z_]{2}', see_sentence)) < 3)):
+                    if not re.search(r'\W', see_sentence).start() == 0:
+                        # print(see_sentence)
+                          f.write(see_sentence)
+                          f.write('\n')
         f.write('\n')
 
 print('done')
