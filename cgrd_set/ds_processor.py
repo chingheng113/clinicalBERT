@@ -17,6 +17,8 @@ note_icd9 = note_icd9[selected_cols]
 #
 # note_icd9 = note_icd9[0:100]
 
+# see https://github.com/allenai/scispacy
+# pip install https://s3-us-west-2.amazonaws.com/ai2-s2-scispacy/releases/v0.2.3/en_core_sci_md-0.2.3.tar.gz
 nlp = spacy.load('en_core_sci_md', disable=['tagger','ner'])
 with open('../data/ds.txt', 'w', encoding="utf-8") as f:
     for inx, row in note_icd9.iterrows():
