@@ -15,7 +15,7 @@ note_icd9 = pd.merge(note_icd9, selected_ids_icd9, on=['院區', '資料年月',
 print(note_icd9.shape)
 note_icd9 = note_icd9[selected_cols]
 #
-# note_icd9 = note_icd9[0:100]
+note_icd9 = note_icd9[0:100]
 
 # see https://github.com/allenai/scispacy
 # pip install https://s3-us-west-2.amazonaws.com/ai2-s2-scispacy/releases/v0.2.3/en_core_sci_md-0.2.3.tar.gz
@@ -30,7 +30,7 @@ with open('../data/ds.txt', 'w', encoding="utf-8") as f:
             # fix bullet points
             parg = re.sub(r'(\d+[.{1}][\D])', r'. \1', parg)
             # remove multi-spaces
-            parg = re.sub(' +', ' ', parg)
+            parg = re.sub(r' +', ' ', parg)
             # print(parg)
             # remove Chinese
             parg = re.sub(r'[\u4e00-\u9fff]+', '', parg)
@@ -49,5 +49,6 @@ with open('../data/ds.txt', 'w', encoding="utf-8") as f:
                           f.write(see_sentence)
                           f.write('\n')
         f.write('\n')
+        print(inx)
 
 print('done')
