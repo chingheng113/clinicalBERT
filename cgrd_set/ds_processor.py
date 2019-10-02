@@ -46,8 +46,8 @@ with open('../data/ds.txt', 'w', encoding="utf-8") as f:
                 if not ((len(see_sentence.split()) < 3) | (see_sentence == 'nil') | (len(re.findall(r'[a-zA-Z_]{2}', see_sentence)) < 3)):
                     if not re.search(r'\W', see_sentence).start() == 0:
                         # print(see_sentence)
-                          f.write(see_sentence)
-                          f.write('\n')
+                        f.write(see_sentence)
+                        f.write('\n')
         f.write('\n')
         print(inx)
 
