@@ -999,11 +999,10 @@ class Hacked_arg:
 
 
 if __name__ == "__main__":
-
     #  cola
     print(current_path)
     hacked_arg = Hacked_arg(
-        data_dir=current_path,
+        data_dir=os.path.join(current_path, 'data'),
         bert_model='stroke_bert',
         # bert_model='bert-base-cased',
         # bert_model='clinical_bert',
@@ -1029,7 +1028,6 @@ if __name__ == "__main__":
         server_ip='',
         server_port='',
         # nee to rename 'strokeBERT_dis-100000' file which converted by script to 'pytorch_model.bin'
-        # model_loc=os.path.join('..', 'models', 'biobert_pretrain_output_all_notes_150000')
         model_loc=os.path.join('..', 'models', 'strokeBERT_dis_100000')
     )
 
