@@ -36,7 +36,7 @@ print(note_down_task.shape)
 nlp = spacy.load('en_core_sci_md', disable=['tagger','ner'])
 
 # BERT training
-note_bert = note_bert[0:100]
+# note_bert = note_bert[0:100]
 with open('../data/carotid.txt', 'w', encoding="utf-8") as f:
     for inx, row in note_bert.iterrows():
         # print(selected_cols[i])
