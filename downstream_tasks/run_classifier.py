@@ -557,7 +557,7 @@ def main(args):
     # args = parser.parse_args()
 
     # specifies the path where the biobert or clinical bert model is saved
-    if args.bert_model == 'biobert' or args.bert_model == 'clinical_bert':
+    if args.bert_model == 'biobert' or args.bert_model == 'clinical_bert' or args.bert_model == 'stroke_bert':
         args.bert_model = args.model_loc
 
     print(args.bert_model)
@@ -1004,7 +1004,8 @@ if __name__ == "__main__":
     print(current_path)
     hacked_arg = Hacked_arg(
         data_dir=current_path,
-        bert_model='bert-base-cased',
+        bert_model='stroke_bert',
+        # bert_model='bert-base-cased',
         # bert_model='clinical_bert',
         task_name='carotid',
         output_dir=os.path.join(current_path, 'output'),
@@ -1027,7 +1028,9 @@ if __name__ == "__main__":
         loss_scale=0,
         server_ip='',
         server_port='',
-        model_loc=os.path.join(current_path, 'biobert_pretrain_output_all_notes_150000')
+        # nee to rename 'strokeBERT_dis-100000' file which converted by script to 'pytorch_model.bin'
+        # model_loc=os.path.join('..', 'models', 'biobert_pretrain_output_all_notes_150000')
+        model_loc=os.path.join('..', 'models', 'strokeBERT_dis_100000')
     )
 
     main(hacked_arg)
