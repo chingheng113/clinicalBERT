@@ -552,9 +552,10 @@ def setup_parser():
     parser.add_argument('--model_loc', type=str, default='', help="Specify the location of the bio or clinical bert model")
     return parser
 
-def main(args):
-    # parser = setup_parser()
-    # args = parser.parse_args()
+def main():
+# def main(args):
+    parser = setup_parser()
+    args = parser.parse_args()
 
     # specifies the path where the biobert or clinical bert model is saved
     if args.bert_model == 'biobert' or args.bert_model == 'clinical_bert' or args.bert_model == 'stroke_bert':
@@ -998,7 +999,7 @@ class Hacked_arg:
 
 
 if __name__ == "__main__":
-    # python run_classifier --bert_model clinical_bert --model_loc ../models/strokeBERT_dis_100000 --data_dir ./data --task_name carotid --output_dir ./c_output --max_seq_length 400 --train_batch_size 24 --do_train True --do_test True
+    # python run_classifier.py --bert_model clinical_bert --model_loc ../models/strokeBERT_dis_100000 --data_dir ./data --task_name carotid --output_dir ./c_output --max_seq_length 400 --train_batch_size 24 --do_train True --do_test True
     main()
 
     #  directly run the code
