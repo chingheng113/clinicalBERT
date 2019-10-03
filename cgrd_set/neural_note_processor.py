@@ -14,9 +14,9 @@ note_1 = note_1[selected_cols]
 note_1 = note_1[note_1['檢查項目'] != 'M29-079']
 note_1 = note_1[0:100]
 
-delimiters = ['Conclusion:', 'Comments:', 'Interpretation:', 'INTERPRETATION:']
+delimiters = ['Conclusion:', 'Comments:', 'Interpretation:', 'INTERPRETATION:', 'Doppler Findings:', 'COMMENTS:']
 nlp = spacy.load('en_core_sci_md', disable=['tagger', 'ner'])
-with open('nu_note.txt', 'w', encoding="utf-8") as f:
+with open('../data/nu_note.txt', 'w', encoding="utf-8") as f:
     for inx, row in note_1.iterrows():
         parg = str(row[selected_cols[1]])
         for delimiter in delimiters:
