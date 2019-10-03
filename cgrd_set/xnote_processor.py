@@ -9,10 +9,10 @@ note_1 = pd.read_csv('14653_X光科報告_1.csv')
 # print(note_1.columns.values)
 selected_cols = ['報告01']
 note_1 = note_1[selected_cols]
-note_1 = note_1[0:100]
+# note_1 = note_1[0:100]
 
 nlp = spacy.load('en_core_sci_md', disable=['tagger', 'ner'])
-with open('xnote.txt', 'w', encoding="utf-8") as f:
+with open('../data/xnote.txt', 'w', encoding="utf-8") as f:
     for inx, row in note_1.iterrows():
         for i in range(len(selected_cols)):
             parg = str(row[selected_cols[i]])
