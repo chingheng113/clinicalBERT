@@ -5,7 +5,11 @@ import os
 current_path = os.path.dirname(__file__)
 
 
-note_icd9 = pd.read_csv('14653_X光科報告_1.csv')
+note_1 = pd.read_csv('14653_X光科報告_1.csv')
+print(note_1.shape)
+note_2 = pd.read_csv('14653_X光科報告_2.csv')
+print(note_2.shape)
+note_icd9 = pd.concat([note_1, note_2], axis=0)
 print(note_icd9.shape)
 selected_ids_icd9 = pd.read_csv('selected_ID_icd9_stroke.csv')
 note_icd9 = pd.merge(note_icd9, selected_ids_icd9, on=['院區', '資料年月', '歸戶代號'])
@@ -19,7 +23,6 @@ with open('../data/xnote.txt', 'w', encoding="utf-8") as f:
     for inx, row in note_icd9.iterrows():
         for i in range(len(selected_cols)):
             parg = str(row[selected_cols[i]])
-            print(parg)
             # remove special characters
             parg = re.sub(r'(^;)|(;;;)|(=+>)|(={2})|(-+>)|(={2})|(\*{3})', '', parg)
             # fix bullet points
@@ -43,5 +46,6 @@ with open('../data/xnote.txt', 'w', encoding="utf-8") as f:
                     f.write(see_sentence)
                     f.write('\n')
         f.write('\n')
+        print(inx)
 
 print('done')
