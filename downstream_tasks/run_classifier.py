@@ -999,7 +999,7 @@ class Hacked_arg:
 
 
 if __name__ == "__main__":
-    # python run_classifier.py --bert_model clinical_bert --model_loc ../models/strokeBERT_dis_100000 --data_dir ./data --task_name carotid --output_dir ./c_output --max_seq_length 400 --train_batch_size 24 --do_train True --do_test True
+    # python run_classifier.py --bert_model clinical_bert --model_loc ../models/strokeBERT_dis_100000 --data_dir ./data --task_name carotid --output_dir ./c_output --max_seq_length 400 --train_batch_size 24 --do_train  --do_test
     main()
 
     #  directly run the code
