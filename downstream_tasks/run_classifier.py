@@ -1030,7 +1030,6 @@ if __name__ == "__main__":
     #     loss_scale=0,
     #     server_ip='',
     #     server_port='',
-    #     # nee to rename 'strokeBERT_dis-100000' file which converted by script to 'pytorch_model.bin'
     #     model_loc=os.path.join('..', 'models', 'strokeBERT_dis_100000')
     # )
     # main(hacked_arg)

@@ -1,0 +1,13 @@
+/data/linc9/conda/envs/bert/bin/python3 run_classifier.py \
+			  --data_dir=./data \
+			  --bert_model=stroke_bert \
+			  --model_loc ../models/strokeBERT_dc_100000 \
+			  --task_name carotid \
+			  --do_train \
+			  --do_test \
+			  --output_dir=./carotid_s_dc_output_400  \
+			  --num_train_epochs 10.0 \
+			  --learning_rate 5e-5 \
+			  --train_batch_size 24 \
+			  --max_seq_length 400 \
+			  --gradient_accumulation_steps 1
