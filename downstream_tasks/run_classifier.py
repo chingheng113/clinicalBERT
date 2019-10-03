@@ -997,38 +997,39 @@ class Hacked_arg:
         self.model_loc = model_loc
 
 
-
 if __name__ == "__main__":
-    #  cola
-    print(current_path)
-    hacked_arg = Hacked_arg(
-        data_dir=os.path.join(current_path, 'data'),
-        bert_model='stroke_bert',
-        # bert_model='bert-base-cased',
-        # bert_model='clinical_bert',
-        task_name='carotid',
-        output_dir=os.path.join(current_path, 'output'),
-        cache_dir='',
-        max_seq_length=400,
-        do_train=True,
-        do_eval=False,
-        do_test=True,
-        do_lower_case=False,
-        train_batch_size=24,
-        eval_batch_size=24,
-        learning_rate=5e-5,
-        num_train_epochs=10.0,
-        warmup_proportion=0.1,
-        no_cuda=False,
-        local_rank=-1,
-        seed=369,
-        gradient_accumulation_steps=1,
-        fp16=False,
-        loss_scale=0,
-        server_ip='',
-        server_port='',
-        # nee to rename 'strokeBERT_dis-100000' file which converted by script to 'pytorch_model.bin'
-        model_loc=os.path.join('..', 'models', 'strokeBERT_dis_100000')
-    )
+    # python run_classifier --bert_model clinical_bert --model_loc ../models/strokeBERT_dis_100000 --data_dir ./data --task_name carotid --output_dir ./c_output --max_seq_length 400 --train_batch_size 24 --do_train True --do_test True
+    main()
 
-    main(hacked_arg)
+    #  directly run the code
+    # print(current_path)
+    # hacked_arg = Hacked_arg(
+    #     data_dir=os.path.join(current_path, 'data'),
+    #     bert_model='stroke_bert',
+    #     # bert_model='bert-base-cased',
+    #     # bert_model='clinical_bert',
+    #     task_name='carotid',
+    #     output_dir=os.path.join(current_path, 'output'),
+    #     cache_dir='',
+    #     max_seq_length=400,
+    #     do_train=True,
+    #     do_eval=False,
+    #     do_test=True,
+    #     do_lower_case=False,
+    #     train_batch_size=24,
+    #     eval_batch_size=24,
+    #     learning_rate=5e-5,
+    #     num_train_epochs=10.0,
+    #     warmup_proportion=0.1,
+    #     no_cuda=False,
+    #     local_rank=-1,
+    #     seed=369,
+    #     gradient_accumulation_steps=1,
+    #     fp16=False,
+    #     loss_scale=0,
+    #     server_ip='',
+    #     server_port='',
+    #     # nee to rename 'strokeBERT_dis-100000' file which converted by script to 'pytorch_model.bin'
+    #     model_loc=os.path.join('..', 'models', 'strokeBERT_dis_100000')
+    # )
+    # main(hacked_arg)
