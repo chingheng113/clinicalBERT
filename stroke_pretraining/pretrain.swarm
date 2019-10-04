@@ -2,6 +2,6 @@
 --input_file=/data/linc9/clinicalBERT/data/tfrecords/ds.tfrecord,/data/linc9/clinicalBERT/data/tfrecords/carotid.tfrecord,/data/linc9/clinicalBERT/data/tfrecords/xnote.tfrecord,/data/linc9/clinicalBERT/data/tfrecords/nu_note.tfrecord \
 --bert_config_file=/data/linc9/clinicalBERT/models/biobert_pretrain_output_all_notes_150000/bert_config.json \
 --init_checkpoint=/data/linc9/clinicalBERT/models/biobert_pretrain_output_all_notes_150000/model.ckpt-150000 \
---output_dir=/data/linc9/clinicalBERT/models/strokeBERT_all \
+--output_dir=/data/linc9/clinicalBERT/models/strokeBERT_all_slow_gpu \
 --num_train_steps=150000 \
 --do_train=True
