@@ -324,8 +324,9 @@ class CaroditProcessor(DataProcessor):
         examples = []
         gid = 0
         data = self.read_variable(data_dir)
-        X = data[0]
-        Y = data[1]
+        X = data['processed_content']
+        Y = data[['RCCA', 'REICA', 'RIICA', 'RACA', 'RMCA', 'RPCA', 'REVA', 'RIVA', 'BA', 'LCCA', 'LEICA', 'LIICA',
+                'LACA', 'LMCA', 'LPCA', 'LEVA', 'LIVA']].values
         for x, y in zip(X, Y):
             guid = "guid-%s" % (gid)
             examples.append(
