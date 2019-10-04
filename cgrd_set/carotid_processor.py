@@ -1,11 +1,11 @@
 import spacy
 import re
 import pandas as pd
-import numpy as np
+from pathlib import Path
 import os
 import pickle
-from sklearn.model_selection import train_test_split
 current_path = os.path.dirname(__file__)
+root_path = Path(current_path).parent
 
 
 def save_variable(val, val_name):
@@ -13,7 +13,8 @@ def save_variable(val, val_name):
     with open(save_path, 'wb') as file_pi:
         pickle.dump(val, file_pi)
 
-selected_cols = ['CONTENT', 'RCCA', 'REICA', 'RIICA', 'RACA', 'RMCA', 'RPCA', 'REVA', 'RIVA', 'BA',
+
+selected_cols = ['ID', 'CONTENT', 'RCCA', 'REICA', 'RIICA', 'RACA', 'RMCA', 'RPCA', 'REVA', 'RIVA', 'BA',
                  'LCCA', 'LEICA', 'LIICA', 'LACA', 'LMCA', 'LPCA', 'LEVA', 'LIVA', 'over_2weeks']
 
 note_all = pd.read_csv('carotid_101318_all.csv')
@@ -63,11 +64,7 @@ with open('../data/carotid.txt', 'w', encoding="utf-8") as f:
 
 # Down stream task dataset
 # note_down_task = note_down_task[0:100]
-text_arr = []
-label_arr = []
 for inx, row in note_down_task.iterrows():
-    label = row[['RCCA', 'REICA', 'RIICA', 'RACA', 'RMCA', 'RPCA', 'REVA', 'RIVA', 'BA',
-                 'LCCA', 'LEICA', 'LIICA', 'LACA', 'LMCA', 'LPCA', 'LEVA', 'LIVA']].values
     parg = str(row['CONTENT'])
     # remove special characters
     parg = re.sub(r'(^;)|(;;;)|(=+>)|(={2})|(-+>)|(={2})|(\*{3})', '', parg)
@@ -86,16 +83,8 @@ for inx, row in note_down_task.iterrows():
                 len(re.findall(r'[a-zA-Z_]{2}', see_sentence)) < 3)):
             if not re.search(r'\W', see_sentence).start() == 0:
                 processed_sentence += see_sentence+'\n'
-    text_arr.append(processed_sentence)
-    label_arr.append(label)
+    note_down_task.loc[inx, 'processed_content'] = processed_sentence
 
-text_arr = np.array(text_arr)
-label_arr = np.array(label_arr)
-
-# Train, Test split
-x_train, x_test, Y_train, Y_test = train_test_split(text_arr, label_arr, test_size=0.2, random_state=42)
-
-save_variable([x_train, Y_train], os.path.join('..', 'downstream_tasks', 'data', 'training_bert.pickle'))
-save_variable([x_test, Y_test], os.path.join('..', 'downstream_tasks', 'data', 'test_bert.pickle'))
+note_down_task.to_csv(os.path.join(root_path, 'downstream_tasks', 'data', 'carotid_downstream.csv'))
 
 print('done')

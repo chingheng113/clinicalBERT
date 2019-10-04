@@ -13,41 +13,26 @@ def save_variable(val, val_name):
         pickle.dump(val, file_pi)
 
 # read data
-data = pd.read_csv('carotid_101518_modified.csv')
-data.dropna(subset=['CONTENT'], axis=0, inplace=True)
-# Preprocessing
-text_arr = []
-label_arr = []
-for index, row in data.iterrows():
-    label = row[['RCCA', 'REICA', 'RIICA', 'RACA', 'RMCA', 'RPCA', 'REVA', 'RIVA', 'BA',
-                 'LCCA', 'LEICA', 'LIICA', 'LACA', 'LMCA', 'LPCA', 'LEVA', 'LIVA']].values
-    corpus = row['CONTENT']
-    if '<BASE64>' not in corpus:
-        sentences = corpus.split('\n')
-        processed_sentence = ''
-        for sentence in sentences:
-            if len(re.findall(r'[\u4e00-\u9fff]+', sentence)) == 0:
-                # no chinese sentence
-                if re.search('(>\s*\d+|<\s*\d+)', sentence):
-                    sentence = sentence.replace('>', ' greater ')
-                    sentence = sentence.replace('<', ' less ')
-                sentence = sentence.replace('%', ' percent')
-                processed_sentence += sentence+' '
-        processed_sentence = re.sub(' +', ' ', processed_sentence)
-        text_arr.append(processed_sentence)
-        # multi-babel
-        label_arr.append(label)
-        # binary
-        # if sum(label) == 0:
-        #     label_arr.append('0')
-        # else:
-        #     label_arr.append('1')
-text_arr = np.array(text_arr)
-label_arr = np.array(label_arr)
-# Train, Test split
-x_train, x_test, Y_train, Y_test = train_test_split(text_arr, label_arr, test_size=0.2, random_state=42)
+data = pd.read_csv('carotid_downstream.csv')
+data.dropna(subset=['processed_content'], axis=0, inplace=True)
+selected_cols = ['ID', 'processed_content', 'RCCA', 'REICA', 'RIICA', 'RACA', 'RMCA', 'RPCA', 'REVA', 'RIVA', 'BA',
+                 'LCCA', 'LEICA', 'LIICA', 'LACA', 'LMCA', 'LPCA', 'LEVA', 'LIVA']
+data = data[selected_cols]
+# id_data = data[['ID']]
+# x_data = data[['processed_content']]
+# y_data = data[['RCCA', 'REICA', 'RIICA', 'RACA', 'RMCA', 'RPCA', 'REVA', 'RIVA', 'BA',
+#                'LCCA', 'LEICA', 'LIICA', 'LACA', 'LMCA', 'LPCA', 'LEVA', 'LIVA']]
 
-save_variable([x_train, Y_train], os.path.join(current_path, 'downstream_tasks', 'training_bert.pickle'))
-save_variable([x_test, Y_test], os.path.join(current_path, 'downstream_tasks', 'test_bert.pickle'))
+for i in range(10):
+    training_data, testing_data = train_test_split(data, test_size=0.2, random_state=i)
+    # dir_path = 'round_'+str(i)
+    dir_path = str(os.path.join('carotid', 'round_' + str(i)))
+    if not os.path.exists(dir_path):
+        os.makedirs(dir_path)
+    training_data.to_csv(os.path.join(dir_path, 'training_'+ str(i) + '.csv'), index=False)
+    testing_data.to_csv(os.path.join(dir_path, 'testing_' + str(i) + '.csv'), index=False)
+    save_variable(training_data, os.path.join(dir_path, 'training_bert.pickle'))
+    save_variable(testing_data, os.path.join(dir_path, 'test_bert.pickle'))
+    print(i)
 
 print('done')
