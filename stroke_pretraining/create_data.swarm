@@ -1,2 +1,1 @@
-# /data/linc9/conda/envs/bert/bin/python3 create_pretraining_data.py --input_file ../data/ds.txt --output_file ../data/tfrecords/ds.tfrecord --vocab_file=../models/biobert_pretrain_output_all_notes_150000/vocab.txt
-/data/linc9/conda/envs/bert/bin/python3 create_pretraining_data.py --input_file ../data/xnote.txt --output_file ../data/tfrecords/xnote.tfrecord --vocab_file=../models/biobert_pretrain_output_all_notes_150000/vocab.txt
+/data/linc9/conda/envs/bert/bin/python3 create_pretraining_data.py --input_file ../data/nu_note.txt --output_file ../data/tfrecords/nu_note.tfrecord --vocab_file=../models/biobert_pretrain_output_all_notes_150000/vocab.txt
