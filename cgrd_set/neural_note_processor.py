@@ -18,7 +18,7 @@ print(note_icd9.shape)
 selected_cols = ['檢查項目', '報告01']
 note_icd9 = note_icd9[selected_cols]
 
-note_icd9 = note_icd9[0:100]
+# note_icd9 = note_icd9[0:100]
 
 delimiters = ['Conclusion:', 'Comments:', 'Interpretation:', 'INTERPRETATION:', 'Doppler Findings:', 'COMMENTS:', 'ULTRASOUND DIAGNOSIS:']
 nlp = spacy.load('en_core_sci_md', disable=['tagger', 'ner'])
