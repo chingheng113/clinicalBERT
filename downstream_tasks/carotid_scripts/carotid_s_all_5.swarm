@@ -1,4 +1,4 @@
-/data/linc9/conda/envs/bert/bin/python3 run_classifier.py \
+/data/linc9/conda/envs/bert/bin/python3 ../run_classifier.py \
 			  --data_dir=../data/carotid/round_5 \
 			  --bert_model=stroke_bert \
 			  --model_loc ../models/strokeBERT_all_150000 \
