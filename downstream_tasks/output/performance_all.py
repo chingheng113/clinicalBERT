@@ -1,19 +1,20 @@
 import pandas as pd
 import numpy as np
-from sklearn.metrics import roc_curve, auc, confusion_matrix, classification_report
+from sklearn.metrics import roc_curve, auc, f1_score, confusion_matrix, classification_report
 import os
 from scipy import interp
 import pickle
 import matplotlib.pyplot as plt
+from sklearn.preprocessing import label_binarize
 
-
-model_name = 'c_all_'
+model_name = 's_all_'
 labels = ['RCCA', 'REICA', 'RIICA', 'RACA', 'RMCA', 'RPCA', 'REVA', 'RIVA', 'BA', 'LCCA', 'LEICA', 'LIICA',
           'LACA', 'LMCA', 'LPCA', 'LEVA', 'LIVA']
 for lab_inx in range(17):
     i = 0
     tprs = []
     aucs = []
+    f1s = []
     for inx in range(10):
         read_path = os.path.join('carotid', model_name+str(inx), 'test_prediction.pickle')
         with open(read_path, 'rb') as f:
@@ -29,6 +30,8 @@ for lab_inx in range(17):
             aucs.append(roc_auc)
             # plt.plot(fpr, tpr, lw=1, alpha=0.3,
             #          label='ROC fold %d (AUC = %0.2f)' % (i, roc_auc))
+            y = np.where(all_logits[:, lab_inx] < 0, 0, 1)
+            f1s.append(f1_score(all_labels[:, lab_inx], y, average='micro'))
             i += 1
     # plt.plot([0, 1], [0, 1], linestyle='--', lw=2, color='r',
     #          label='Chance', alpha=.8)
@@ -36,10 +39,14 @@ for lab_inx in range(17):
     mean_tpr[-1] = 1.0
     mean_auc = auc(mean_fpr, mean_tpr)
     std_auc = np.std(aucs)
+    mean_f1 = np.mean(f1s, axis=0)
+    std_f1 = np.std(f1s)
     print(model_name)
     print(labels[lab_inx])
     print(mean_auc)
     print(std_auc)
+    print(mean_f1)
+    print(std_f1)
     # plt.plot(mean_fpr, mean_tpr, color='b',
     #          label=r'Mean ROC (AUC = %0.2f $\pm$ %0.2f)' % (mean_auc, std_auc),
     #          lw=2, alpha=.8)
