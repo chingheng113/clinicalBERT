@@ -52,9 +52,13 @@ def get_attention_scores(model, i, text):
     return attention_probs, tokenized
 
 # ===============================
-bert_config  = BertConfig(os.path.join(current_path, 'downstream_tasks', 'output', 'carotid', 'sb_all_0', 'config.json'))
+# bert_config  = BertConfig(os.path.join(current_path, 'downstream_tasks', 'output', 'carotid', 'sb_all_0', 'config.json'))
+# tokenizer = BertTokenizer.from_pretrained(os.path.join(current_path, 'models', 'strokeBERT_biobased_all_150000'), do_lower_case=False)
+
+bert_config  = BertConfig(os.path.join(current_path, 'downstream_tasks', 'output', 'carotid', 'b_all_0', 'config.json'))
+tokenizer = BertTokenizer.from_pretrained(os.path.join(current_path, 'models', 'biobert_v1.0_pubmed_pmc'), do_lower_case=False)
+
 model = BertForMultiLabelSequenceClassification(bert_config, num_labels=17)
-tokenizer = BertTokenizer.from_pretrained(os.path.join(current_path, 'models', 'strokeBERT_biobased_all_150000'), do_lower_case=False)
 # tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
 
 text ='Mild focal narrowing at right MCA distal M1 segment'
@@ -67,7 +71,8 @@ plt.clf()
 
 f=plt.figure(figsize=(10,10))
 ax = f.add_subplot(1,1,1)
-i=ax.imshow(map1,interpolation='nearest',cmap='gray')
+i=ax.imshow(map1, interpolation='nearest', cmap='PRGn')
+f.colorbar(i, ax=ax)
 
 ax.set_yticks(range(len(tokens)))
 ax.set_yticklabels(tokens)
