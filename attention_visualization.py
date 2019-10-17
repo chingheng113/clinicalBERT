@@ -61,7 +61,7 @@ tokenizer = BertTokenizer.from_pretrained(os.path.join(current_path, 'models', '
 model = BertForMultiLabelSequenceClassification(bert_config, num_labels=17)
 # tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
 
-text ='Mild focal narrowing at right MCA distal M1 segment'
+text ='significant stenosis at right MCA M1 segment and right distal VA'
 x, tokens = get_attention_scores(model, 0, text)
 
 map1=np.asarray(x[0][1].detach().numpy())
@@ -71,8 +71,8 @@ plt.clf()
 
 f=plt.figure(figsize=(10,10))
 ax = f.add_subplot(1,1,1)
-i=ax.imshow(map1, interpolation='nearest', cmap='PRGn')
-f.colorbar(i, ax=ax)
+i=ax.imshow(map1, interpolation='nearest', cmap='Purples')
+# f.colorbar(i, ax=ax)
 
 ax.set_yticks(range(len(tokens)))
 ax.set_yticklabels(tokens)
