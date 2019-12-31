@@ -20,6 +20,7 @@ def clean_text(parg):
 
 
 df = pd.read_csv('recurrent_stroke_ds.csv')
+df.dropna(axis=0, subset=['主訴', '病史', '住院治療經過'], inplace=True)
 df['主訴'] = df['主訴'].apply(clean_text)
 df['病史'] = df['病史'].apply(clean_text)
 df['住院治療經過'] = df['住院治療經過'].apply(clean_text)
