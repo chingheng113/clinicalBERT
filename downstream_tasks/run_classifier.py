@@ -334,6 +334,45 @@ class CaroditProcessor(DataProcessor):
             gid += 1
         return examples
 
+
+class RestrokeProcessor(DataProcessor):
+    def read_variable(self, open_path):
+        with open(open_path, 'rb') as file_pi:
+            val = pickle.load(file_pi)
+            return val
+
+    def get_train_examples(self, data_dir):
+        """Gets a collection of `InputExample`s for the train set."""
+        file_path = os.path.join(data_dir, "training_bert.pickle")
+        return self._create_examples(file_path)
+
+    def get_dev_examples(self, data_dir):
+        """See base class."""
+        file_path = os.path.join(data_dir, "test_bert.pickle")
+        return self._create_examples(file_path)
+
+    def get_test_examples(self, data_dir):
+        """Gets a collection of `InputExample`s for the test set."""
+        file_path = os.path.join(data_dir, "test_bert.pickle")
+        return self._create_examples(file_path)
+
+    def get_labels(self):
+        """See base class."""
+        return ["0", "1"]
+
+    def _create_examples(self, data_dir):
+        examples = []
+        gid = 0
+        data = self.read_variable(data_dir)
+        X = data['processed_content']
+        Y = data[['label']].values
+        for x, y in zip(X, Y):
+            guid = "guid-%s" % (gid)
+            examples.append(
+                InputExample(guid=guid, text_a=x, text_b=None, label=y))
+            gid += 1
+        return examples
+
 # =========================
 
 
@@ -559,7 +598,7 @@ def main():
     args = parser.parse_args()
 
     # specifies the path where the biobert or clinical bert model is saved
-    if args.bert_model == 'biobert' or args.bert_model == 'clinical_bert' or args.bert_model == 'stroke_bert':
+    if args.bert_model == 'biobert' or args.bert_model == 'clinical_bert' or args.bert_model == 'stroke_bert' or args.bert_model == 'stroke_biobased_bert':
         args.bert_model = args.model_loc
 
     print(args.bert_model)
@@ -576,7 +615,8 @@ def main():
         "mnli": MnliProcessor,
         "mrpc": MrpcProcessor,
         "mednli": MedNLIProcessor,
-        "carotid": CaroditProcessor
+        "carotid": CaroditProcessor,
+        "restroke": RestrokeProcessor
     }
 
     num_labels_task = {
@@ -584,7 +624,8 @@ def main():
         "mnli": 3,
         "mrpc": 2,
         "mednli": 3,
-        "carotid": 17
+        "carotid": 17,
+        "restroke": 2
     }
 
     if args.local_rank == -1 or args.no_cuda:

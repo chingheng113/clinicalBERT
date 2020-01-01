@@ -1,6 +1,6 @@
 /data/linc9/conda/envs/bert/bin/python3 ../run_classifier.py \
 			  --data_dir=../data/carotid/round_4 \
-			  --bert_model=stroke_bert \
+			  --bert_model=biobert \
 			  --model_loc ../../models/biobert_v1.0_pubmed_pmc \
 			  --task_name carotid \
 			  --do_train \

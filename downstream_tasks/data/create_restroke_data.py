@@ -1,8 +1,10 @@
 import pandas as pd
+import pickle
 from sklearn.utils import resample
 from sklearn.model_selection import train_test_split
-import numpy as np
+import os
 import re
+current_path = os.path.dirname(__file__)
 
 
 def clean_text(parg):
@@ -21,6 +23,12 @@ def clean_text(parg):
     return parg
 
 
+def save_variable(val, val_name):
+    save_path = os.path.join(current_path, val_name)
+    with open(save_path, 'wb') as file_pi:
+        pickle.dump(val, file_pi)
+
+
 df = pd.read_csv('recurrent_stroke_ds.csv')
 df.dropna(axis=0, subset=['主訴', '病史', '住院治療經過'], inplace=True)
 
@@ -33,8 +41,18 @@ resampled = resample(data[data.label == 0],
                      n_samples=data[data.label == 1].shape[0],
                      random_state=123)
 data = pd.concat([data[data.label == 1], resampled])
+data.rename(columns={'歸戶代號':'ID'}, inplace=True)
 #
-for i in range(10):
+for i in range(1):
     training_data, testing_data = train_test_split(data, test_size=0.2, random_state=i)
+    dir_path = str(os.path.join('reStroke', 'round_' + str(i)))
+    if not os.path.exists(dir_path):
+        os.makedirs(dir_path)
+    training_data.to_csv(os.path.join(dir_path, 'training_' + str(i) + '.csv'), index=False)
+    testing_data.to_csv(os.path.join(dir_path, 'testing_' + str(i) + '.csv'), index=False)
+    save_variable(training_data, os.path.join(dir_path, 'training_bert.pickle'))
+    save_variable(testing_data, os.path.join(dir_path, 'test_bert.pickle'))
+    print(i)
+
 # data.to_csv('see.csv', index=False, encoding='utf-8-sig')
 print('done')
