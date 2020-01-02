@@ -966,7 +966,17 @@ def main():
                         all_labels = np.concatenate((all_labels, label_ids.detach().cpu().numpy()), axis=0)
                 else:
                     logits = logits.detach().cpu().numpy()
+                    if all_logits is None:
+                        all_logits = logits
+                    else:
+                        all_logits = np.concatenate((all_logits, logits), axis=0)
+
                     label_ids = label_ids.to('cpu').numpy()
+                    if all_labels is None:
+                        all_labels = label_ids
+                    else:
+                        all_labels = np.concatenate((all_labels, label_ids), axis=0)
+
                     tmp_test_accuracy = accuracy(logits, label_ids)
 
                     test_loss += tmp_test_loss.mean().item()
@@ -999,7 +1009,7 @@ def main():
                 loss = tr_loss/nb_tr_steps if args.do_train else None
 
                 save_path = os.path.join(args.output_dir, "test_prediction.pickle")
-                predic_result = {'logits': logits, 'labels': label_ids}
+                predic_result = {'all_logits': all_logits, 'all_labels': all_labels}
                 with open(save_path, 'wb') as file_pi:
                     pickle.dump(predic_result, file_pi)
 
