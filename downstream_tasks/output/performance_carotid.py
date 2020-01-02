@@ -3,9 +3,9 @@ from sklearn.metrics import roc_curve, auc, confusion_matrix, classification_rep
 import os
 import pickle
 
-model_name = 'test_prediction(clinical).pickle'
+model_name = 's_all_0'
 print(model_name)
-read_path = os.path.join('downstream_tasks', 'output', model_name)
+read_path = os.path.join('carotid', model_name, 'test_prediction.pickle')
 labels = ['RCCA', 'REICA', 'RIICA', 'RACA', 'RMCA', 'RPCA', 'REVA', 'RIVA', 'BA', 'LCCA', 'LEICA', 'LIICA',
           'LACA', 'LMCA', 'LPCA', 'LEVA', 'LIVA']
 with open(read_path, 'rb') as f:

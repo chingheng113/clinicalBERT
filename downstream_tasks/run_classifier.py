@@ -997,6 +997,12 @@ def main():
                 test_loss = test_loss / nb_test_steps
                 test_accuracy = test_accuracy / nb_test_examples
                 loss = tr_loss/nb_tr_steps if args.do_train else None
+
+                save_path = os.path.join(args.output_dir, "test_prediction.pickle")
+                predic_result = {'logits': logits, 'labels': label_ids}
+                with open(save_path, 'wb') as file_pi:
+                    pickle.dump(predic_result, file_pi)
+
                 result = {'test_loss': test_loss,
                           'test_accuracy': test_accuracy,
                           'global_step': global_step,
