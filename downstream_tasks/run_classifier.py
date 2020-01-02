@@ -358,7 +358,7 @@ class RestrokeProcessor(DataProcessor):
 
     def get_labels(self):
         """See base class."""
-        return ["0", "1"]
+        return [0, 1]
 
     def _create_examples(self, data_dir):
         examples = []
@@ -369,7 +369,7 @@ class RestrokeProcessor(DataProcessor):
         for x, y in zip(X, Y):
             guid = "guid-%s" % (gid)
             examples.append(
-                InputExample(guid=guid, text_a=x, text_b=None, label=y))
+                InputExample(guid=guid, text_a=x, text_b=None, label=y[0]))
             gid += 1
         return examples
 
