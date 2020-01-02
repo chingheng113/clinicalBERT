@@ -9,6 +9,7 @@ current_path = os.path.dirname(__file__)
 
 def clean_text(parg):
     if parg == parg:
+        parg = re.sub(r'(:nil)', '', parg)
         # remove special characters
         parg = re.sub(r'(\s\.)|(\.{2,})|(:{2,})|(^;)|(;;;)|(=+>)|(={2})|(-+>)|(={2})|(\*{3})', '', parg)
         # fix bullet points
