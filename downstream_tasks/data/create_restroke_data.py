@@ -41,8 +41,8 @@ resampled = resample(data[data.label == 0],
                      n_samples=data[data.label == 1].shape[0],
                      random_state=123)
 data = pd.concat([data[data.label == 1], resampled])
-data.rename(columns={'歸戶代號':'ID'}, inplace=True)
 #
+data.rename(columns={'歸戶代號':'ID'}, inplace=True)
 for i in range(1):
     training_data, testing_data = train_test_split(data, test_size=0.2, random_state=i)
     dir_path = str(os.path.join('reStroke', 'round_' + str(i)))
