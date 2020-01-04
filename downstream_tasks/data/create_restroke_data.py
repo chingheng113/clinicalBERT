@@ -43,7 +43,7 @@ resampled = resample(data[data.label == 0],
 data = pd.concat([data[data.label == 1], resampled])
 #
 data.rename(columns={'歸戶代號':'ID'}, inplace=True)
-for i in range(1):
+for i in range(10):
     training_data, testing_data = train_test_split(data, test_size=0.2, random_state=i)
     dir_path = str(os.path.join('reStroke', 'round_' + str(i)))
     if not os.path.exists(dir_path):
