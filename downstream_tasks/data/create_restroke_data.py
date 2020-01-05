@@ -35,16 +35,18 @@ df.dropna(axis=0, subset=['主訴', '病史', '住院治療經過'], inplace=Tru
 df['processed_content'] = df['主訴']+" "+df['病史']+" "+df['住院治療經過']
 df['processed_content'] = df['processed_content'].apply(clean_text)
 data = df[['歸戶代號', 'processed_content', 'label']]
-# sample balance
-resampled = resample(data[data.label == 0],
-                     replace=False,
-                     n_samples=data[data.label == 1].shape[0],
-                     random_state=123)
-data = pd.concat([data[data.label == 1], resampled])
-#
+
 data.rename(columns={'歸戶代號':'ID'}, inplace=True)
 for i in range(10):
-    training_data, testing_data = train_test_split(data, test_size=0.2, random_state=i)
+    # sample balance
+    resampled = resample(data[data.label == 0],
+                         replace=False,
+                         n_samples=data[data.label == 1].shape[0],
+                         random_state=i)
+    balanced_data = pd.concat([data[data.label == 1], resampled])
+    #
+
+    training_data, testing_data = train_test_split(balanced_data, test_size=0.2, random_state=i)
     dir_path = str(os.path.join('reStroke', 'round_' + str(i)))
     if not os.path.exists(dir_path):
         os.makedirs(dir_path)
