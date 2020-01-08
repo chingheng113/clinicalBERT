@@ -7,7 +7,7 @@ import pickle
 import matplotlib.pyplot as plt
 from sklearn.preprocessing import label_binarize
 
-model_name = 's_all_'
+model_name = 'b_all_'
 labels = ['RCCA', 'REICA', 'RIICA', 'RACA', 'RMCA', 'RPCA', 'REVA', 'RIVA', 'BA', 'LCCA', 'LEICA', 'LIICA',
           'LACA', 'LMCA', 'LPCA', 'LEVA', 'LIVA']
 for lab_inx in range(17):
@@ -41,12 +41,11 @@ for lab_inx in range(17):
     std_auc = np.std(aucs)
     mean_f1 = np.mean(f1s, axis=0)
     std_f1 = np.std(f1s)
-    print(model_name)
-    print(labels[lab_inx])
-    print(mean_auc)
-    print(std_auc)
-    print(mean_f1)
-    print(std_f1)
+    # print(model_name)
+    # print(labels[lab_inx])
+    print(round(mean_auc,3), round(std_auc,3))
+    # print(mean_f1)
+    # print(std_f1)
     # plt.plot(mean_fpr, mean_tpr, color='b',
     #          label=r'Mean ROC (AUC = %0.2f $\pm$ %0.2f)' % (mean_auc, std_auc),
     #          lw=2, alpha=.8)
