@@ -14,10 +14,9 @@ def save_variable(val, val_name):
 
 # read data
 data = pd.read_csv('carotid2.csv')
+
 data.dropna(subset=['processed_content'], axis=0, inplace=True)
-selected_cols = ['ID', 'processed_content', 'RCCA', 'REICA', 'RIICA', 'RACA', 'RMCA', 'RPCA', 'REVA', 'RIVA', 'BA',
-                 'LCCA', 'LEICA', 'LIICA', 'LACA', 'LMCA', 'LPCA', 'LEVA', 'LIVA']
-data = data[selected_cols]
+data.rename(columns={'':'ID', '':'processed_content'})
 # id_data = data[['ID']]
 # x_data = data[['processed_content']]
 # y_data = data[['RCCA', 'REICA', 'RIICA', 'RACA', 'RMCA', 'RPCA', 'REVA', 'RIVA', 'BA',
