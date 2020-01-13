@@ -590,6 +590,7 @@ def setup_parser():
     parser.add_argument('--server_ip', type=str, default='', help="Can be used for distant debugging.")
     parser.add_argument('--server_port', type=str, default='', help="Can be used for distant debugging.")
     parser.add_argument('--model_loc', type=str, default='', help="Specify the location of the bio or clinical bert model")
+    parser.add_argument('--vocab_loc', type=str, default='', help="Specify the location of token vocabulary file is necessary")
     return parser
 
 def main():
@@ -671,7 +672,8 @@ def main():
 
 
     tokenizer = BertTokenizer.from_pretrained(args.bert_model, do_lower_case=args.do_lower_case)
-
+    if tokenizer is None:
+        tokenizer = BertTokenizer.from_pretrained(args.vocab_loc, do_lower_case=args.do_lower_case)
 
     print('TRAIN')
     train = processor.get_train_examples(args.data_dir)

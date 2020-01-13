@@ -2,6 +2,7 @@
 			  --data_dir=../data/carotid/round_0 \
 			  --bert_model=biobert \
 			  --model_loc ../output/carotid/b_all_0 \
+			  --vocab_loc ../../models/biobert_v1.0_pubmed_pmc \
 			  --task_name carotid \
 			  --do_eval \
 			  --output_dir=../output/carotid2/b_all_0  \
