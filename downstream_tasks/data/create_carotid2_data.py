@@ -2,7 +2,6 @@ import pandas as pd
 import os
 import pickle
 import re
-from sklearn.model_selection import train_test_split
 current_path = os.path.dirname(__file__)
 
 def clean_text(parg):
@@ -36,10 +35,6 @@ data = pd.read_csv('carotid2.csv')
 data.rename(columns={'IDCode': 'ID', 'RTRESTXT': 'processed_content'}, inplace=True)
 data.dropna(subset=['processed_content'], axis=0, inplace=True)
 data['processed_content'] = data['processed_content'].apply(clean_text)
-# id_data = data[['ID']]
-# x_data = data[['processed_content']]
-# y_data = data[['RCCA', 'REICA', 'RIICA', 'RACA', 'RMCA', 'RPCA', 'REVA', 'RIVA', 'BA',
-#                'LCCA', 'LEICA', 'LIICA', 'LACA', 'LMCA', 'LPCA', 'LEVA', 'LIVA']]
 
 data.to_csv(os.path.join('carotid2', 'testing.csv'), index=False)
 save_variable(data, os.path.join('carotid2', 'test_bert.pickle'))
