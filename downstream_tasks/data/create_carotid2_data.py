@@ -38,6 +38,10 @@ data['processed_content'] = data['processed_content'].apply(clean_text)
 
 data.to_csv(os.path.join('carotid2', 'testing.csv'), index=False)
 save_variable(data, os.path.join('carotid2', 'test_bert.pickle'))
+# There is no training at all... this is independent dataset validation
+# Here is same data but different file name... just for making code running
+data.to_csv(os.path.join('carotid2', 'training.csv'), index=False)
+save_variable(data, os.path.join('carotid2', 'training_bert.pickle'))
 
 
 print('done')
