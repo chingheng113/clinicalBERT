@@ -1,5 +1,4 @@
 import pandas as pd
-import numpy as np
 import os
 import pickle
 import re
@@ -8,10 +7,14 @@ current_path = os.path.dirname(__file__)
 
 def clean_text(parg):
     if parg == parg:
-        a = re.search('findings:', parg, re.IGNORECASE)
+        finding_start = re.search('findings:', parg, re.IGNORECASE)
+        finding_end = re.search('IMPRESSION:', parg, re.IGNORECASE)
+        if finding_end is None:
+            finding_end = re.search('IMPRESSIONS:', parg, re.IGNORECASE)
+        parg = parg[finding_start.regs[0][1]:finding_end.regs[0][0]]
         parg = re.sub(r'(:nil)', '', parg)
         # remove special characters
-        parg = re.sub(r'(\s\.)|(\.{2,})|(:{2,})|(^;)|(;;;)|(=+>)|(={2})|(-+>)|(={2})|(\*{3})', '', parg)
+        parg = re.sub(r'(\s\.)|(\.{2,})|(:{2,})|(^;)|(;;;)|(=+>)|(={2})|(-+>)|(={2})|(\*{3})|(-{2,}|(_{2,}))', '', parg)
         # fix bullet points
         parg = re.sub(r'(\d+[.{1}][\D])', r'. \1', parg)
         # remove Chinese
@@ -33,6 +36,10 @@ data = pd.read_csv('carotid2.csv')
 data.rename(columns={'IDCode': 'ID', 'RTRESTXT': 'processed_content'}, inplace=True)
 data.dropna(subset=['processed_content'], axis=0, inplace=True)
 data['processed_content'] = data['processed_content'].apply(clean_text)
+# id_data = data[['ID']]
+# x_data = data[['processed_content']]
+# y_data = data[['RCCA', 'REICA', 'RIICA', 'RACA', 'RMCA', 'RPCA', 'REVA', 'RIVA', 'BA',
+#                'LCCA', 'LEICA', 'LIICA', 'LACA', 'LMCA', 'LPCA', 'LEVA', 'LIVA']]
 
 data.to_csv(os.path.join('carotid2', 'testing.csv'), index=False)
 save_variable(data, os.path.join('carotid2', 'test_bert.pickle'))
