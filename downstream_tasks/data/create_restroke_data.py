@@ -39,11 +39,11 @@ data = df[['歸戶代號', 'processed_content', 'label']]
 data.rename(columns={'歸戶代號':'ID'}, inplace=True)
 for i in range(10):
     # sample balance
-    resampled = resample(data[data.label == 0],
+    resampled = resample(data[data.label == 1],
                          replace=False,
-                         n_samples=data[data.label == 1].shape[0],
+                         n_samples=data[data.label == 0].shape[0],
                          random_state=i)
-    balanced_data = pd.concat([data[data.label == 1], resampled])
+    balanced_data = pd.concat([data[data.label == 0], resampled])
     #
 
     training_data, testing_data = train_test_split(balanced_data, test_size=0.2, random_state=i)
