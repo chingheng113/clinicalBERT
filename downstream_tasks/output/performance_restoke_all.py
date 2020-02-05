@@ -9,7 +9,7 @@ precisions =[]
 recalls =[]
 fscores =[]
 for i in range(10):
-    model_name = 'b_all_'+str(i)
+    model_name = 'sb_all_'+str(i)
     # print(model_name)
     read_path = os.path.join('restroke', model_name, 'test_prediction.pickle')
     with open(read_path, 'rb') as f:
