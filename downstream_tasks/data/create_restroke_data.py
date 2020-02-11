@@ -28,33 +28,33 @@ def save_variable(val, val_name):
     with open(save_path, 'wb') as file_pi:
         pickle.dump(val, file_pi)
 
+days = ['30', '90', '180', '360']
+for day in days:
+    df = pd.read_csv('recurrent_stroke_ds_'+day+'.csv')
+    df.dropna(axis=0, subset=['主訴', '病史', '住院治療經過'], inplace=True)
 
-df = pd.read_csv('recurrent_stroke_ds.csv')
-df.dropna(axis=0, subset=['主訴', '病史', '住院治療經過'], inplace=True)
+    df['processed_content'] = df['主訴']+" "+df['病史']+" "+df['住院治療經過']
+    df['processed_content'] = df['processed_content'].apply(clean_text)
+    data = df[['歸戶代號', 'processed_content', 'label']]
 
-df['processed_content'] = df['主訴']+" "+df['病史']+" "+df['住院治療經過']
-df['processed_content'] = df['processed_content'].apply(clean_text)
-data = df[['歸戶代號', 'processed_content', 'label']]
+    data.rename(columns={'歸戶代號':'ID'}, inplace=True)
+    for i in range(10):
+        # sample balance
+        resampled = resample(data[data.label == 0],
+                             replace=False,
+                             n_samples=data[data.label == 1].shape[0],
+                             random_state=i)
+        balanced_data = pd.concat([data[data.label == 1], resampled])
+        #
 
-data.rename(columns={'歸戶代號':'ID'}, inplace=True)
-for i in range(10):
-    # sample balance
-    resampled = resample(data[data.label == 1],
-                         replace=False,
-                         n_samples=data[data.label == 0].shape[0],
-                         random_state=i)
-    balanced_data = pd.concat([data[data.label == 0], resampled])
-    #
+        training_data, testing_data = train_test_split(balanced_data, test_size=0.2, random_state=i)
+        dir_path = str(os.path.join('reStroke_'+day, 'round_' + str(i)))
+        if not os.path.exists(dir_path):
+            os.makedirs(dir_path)
+        training_data.to_csv(os.path.join(dir_path, 'training_' + str(i) + '.csv'), index=False)
+        testing_data.to_csv(os.path.join(dir_path, 'testing_' + str(i) + '.csv'), index=False)
+        save_variable(training_data, os.path.join(dir_path, 'training_bert.pickle'))
+        save_variable(testing_data, os.path.join(dir_path, 'test_bert.pickle'))
+        print(i)
 
-    training_data, testing_data = train_test_split(balanced_data, test_size=0.2, random_state=i)
-    dir_path = str(os.path.join('reStroke', 'round_' + str(i)))
-    if not os.path.exists(dir_path):
-        os.makedirs(dir_path)
-    training_data.to_csv(os.path.join(dir_path, 'training_' + str(i) + '.csv'), index=False)
-    testing_data.to_csv(os.path.join(dir_path, 'testing_' + str(i) + '.csv'), index=False)
-    save_variable(training_data, os.path.join(dir_path, 'training_bert.pickle'))
-    save_variable(testing_data, os.path.join(dir_path, 'test_bert.pickle'))
-    print(i)
-
-# data.to_csv('see.csv', index=False, encoding='utf-8-sig')
 print('done')
