@@ -39,15 +39,14 @@ for day in days:
 
     data.rename(columns={'歸戶代號':'ID'}, inplace=True)
     for i in range(10):
-        # sample balance
-        resampled = resample(data[data.label == 0],
+        training_data, testing_data = train_test_split(data, test_size=0.2, random_state=i)
+        # sample balance on training data
+        resampled = resample(training_data[training_data.label == 0],
                              replace=False,
-                             n_samples=data[data.label == 1].shape[0],
+                             n_samples=training_data[training_data.label == 1].shape[0],
                              random_state=i)
-        balanced_data = pd.concat([data[data.label == 1], resampled])
+        training_data = pd.concat([training_data[training_data.label == 1], resampled])
         #
-
-        training_data, testing_data = train_test_split(balanced_data, test_size=0.2, random_state=i)
         dir_path = str(os.path.join('reStroke_'+day, 'round_' + str(i)))
         if not os.path.exists(dir_path):
             os.makedirs(dir_path)
