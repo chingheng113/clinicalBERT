@@ -28,7 +28,7 @@ def save_variable(val, val_name):
     with open(save_path, 'wb') as file_pi:
         pickle.dump(val, file_pi)
 
-days = ['30', '90', '180', '360']
+days = ['all', '30', '90', '180', '360']
 for day in days:
     df = pd.read_csv('recurrent_stroke_ds_'+day+'.csv')
     df.dropna(axis=0, subset=['主訴', '病史', '住院治療經過'], inplace=True)
@@ -41,11 +41,18 @@ for day in days:
     for i in range(10):
         training_data, testing_data = train_test_split(data, test_size=0.2, random_state=i)
         # sample balance on training data
-        resampled = resample(training_data[training_data.label == 0],
-                             replace=False,
-                             n_samples=training_data[training_data.label == 1].shape[0],
-                             random_state=i)
-        training_data = pd.concat([training_data[training_data.label == 1], resampled])
+        if training_data[training_data.label == 0].shape[0] > training_data[training_data.label == 1].shape[0]:
+            resampled = resample(training_data[training_data.label == 0],
+                                 replace=False,
+                                 n_samples=training_data[training_data.label == 1].shape[0],
+                                 random_state=i)
+            training_data = pd.concat([training_data[training_data.label == 1], resampled])
+        else:
+            resampled = resample(training_data[training_data.label == 1],
+                                 replace=False,
+                                 n_samples=training_data[training_data.label == 0].shape[0],
+                                 random_state=i)
+            training_data = pd.concat([training_data[training_data.label == 0], resampled])
         #
         dir_path = str(os.path.join('reStroke_'+day, 'round_' + str(i)))
         if not os.path.exists(dir_path):
