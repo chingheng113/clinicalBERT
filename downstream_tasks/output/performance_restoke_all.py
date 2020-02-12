@@ -11,7 +11,7 @@ fscores =[]
 for i in range(10):
     model_name = 'sb_all_'+str(i)
     # print(model_name)
-    read_path = os.path.join('restroke', model_name, 'test_prediction.pickle')
+    read_path = os.path.join('restroke_30', model_name, 'test_prediction.pickle')
     with open(read_path, 'rb') as f:
         data = pickle.load(f)
         all_logits = data['all_logits']
