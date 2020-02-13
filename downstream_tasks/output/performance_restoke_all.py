@@ -9,9 +9,9 @@ precisions =[]
 recalls =[]
 fscores =[]
 for i in range(10):
-    model_name = 'sb_all_'+str(i)
+    model_name = 'c_all_'+str(i)
     # print(model_name)
-    read_path = os.path.join('restroke_90', model_name, 'test_prediction.pickle')
+    read_path = os.path.join('restroke_all', model_name, 'test_prediction.pickle')
     with open(read_path, 'rb') as f:
         data = pickle.load(f)
         all_logits = data['all_logits']
@@ -28,8 +28,8 @@ for i in range(10):
         # print(classification_report(all_labels, p_label_b))
         # print(confusion_matrix(all_labels, p_label_b))
 
-print(round(np.mean(precisions),3), round(np.std(precisions),3))
-print(round(np.mean(recalls),3), round(np.std(recalls),3))
-print(round(np.mean(fscores),3), round(np.std(fscores),3))
+# print(round(np.mean(precisions),3), round(np.std(precisions),3))
+# print(round(np.mean(recalls),3), round(np.std(recalls),3))
+# print(round(np.mean(fscores),3), round(np.std(fscores),3))
 print(round(np.mean(aucs),3), round(np.std(aucs),3))
 print('done')
