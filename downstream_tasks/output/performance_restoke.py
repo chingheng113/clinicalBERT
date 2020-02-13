@@ -3,9 +3,9 @@ from sklearn.metrics import roc_curve, auc, confusion_matrix, classification_rep
 import os
 import pickle
 
-model_name = 'sb_all_2'
+model_name = 'sb_all_1'
 print(model_name)
-read_path = os.path.join('restroke_30', model_name, 'test_prediction.pickle')
+read_path = os.path.join('restroke_all', model_name, 'test_prediction.pickle')
 with open(read_path, 'rb') as f:
     data = pickle.load(f)
     all_logits = data['all_logits']
