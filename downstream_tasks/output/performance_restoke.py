@@ -3,7 +3,7 @@ from sklearn.metrics import roc_curve, auc, confusion_matrix, classification_rep
 import os
 import pickle
 
-model_name = 'c_all_0'
+model_name = 'sb_all_2'
 print(model_name)
 read_path = os.path.join('restroke_30', model_name, 'test_prediction.pickle')
 with open(read_path, 'rb') as f:
