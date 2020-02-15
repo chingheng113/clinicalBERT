@@ -28,7 +28,7 @@ def save_variable(val, val_name):
     with open(save_path, 'wb') as file_pi:
         pickle.dump(val, file_pi)
 
-days = ['all', '360']
+days = ['m', '360']
 for day in days:
     df = pd.read_csv('recurrent_stroke_ds_'+day+'.csv')
     df.dropna(axis=0, subset=['主訴', '病史', '住院治療經過'], inplace=True)
