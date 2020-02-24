@@ -49,8 +49,7 @@ for model in ['sb', 'c']:
              )
     tprs_upper = np.minimum(mean_tpr + std_tpr, 1)
     tprs_lower = np.maximum(mean_tpr - std_tpr, 0)
-    plt.fill_between(mean_fpr, tprs_lower, tprs_upper, alpha=.2,
-                     label= r'$\pm$ 1 std. dev.')
+    plt.fill_between(mean_fpr, tprs_lower, tprs_upper, alpha=.2)
 
 plt.plot([0, 1], [0, 1], linestyle='--', lw=2, color='black', label='Luck', alpha=.8)
 plt.xlabel('False Positive Rate')
