@@ -7,6 +7,10 @@ import matplotlib.pyplot as plt
 from scipy import interp
 
 for model in ['sb', 'c']:
+    if model == 'sb':
+        label_name = 'StrokeBERT'
+    else:
+        label_name = 'ClinicalBERT'
     aucs = []
     fprs = []
     tprs = []
@@ -45,7 +49,7 @@ for model in ['sb', 'c']:
     mean_tpr = np.mean(tprs, axis=0)
     std_tpr = np.std(tprs, axis=0)
     plt.plot(mean_fpr, mean_tpr,
-             label=model+' (AUC = %0.3f $\pm$ %0.3f)' % (np.mean(aucs), np.std(aucs))
+             label=label_name+' (AUC = %0.3f $\pm$ %0.3f)' % (np.mean(aucs), np.std(aucs))
              )
     tprs_upper = np.minimum(mean_tpr + std_tpr, 1)
     tprs_lower = np.maximum(mean_tpr - std_tpr, 0)
@@ -54,6 +58,7 @@ for model in ['sb', 'c']:
 plt.plot([0, 1], [0, 1], linestyle='--', lw=2, color='black', label='Luck', alpha=.8)
 plt.xlabel('False Positive Rate')
 plt.ylabel('True Positive Rate')
-plt.title('title')
+# plt.title('title')
 plt.legend(loc="lower right")
+plt.savefig('recurent_roc.tif', dpi=300)
 plt.show()
