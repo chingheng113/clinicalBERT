@@ -8,7 +8,7 @@ from scipy import interp
 
 for model in ['sb', 'c']:
     if model == 'sb':
-        label_name = 'StrokeBERT'
+        label_name = 'CvdBERT'
     else:
         label_name = 'ClinicalBERT'
     aucs = []
