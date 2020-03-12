@@ -6,7 +6,7 @@ from torch import nn
 import math
 from pytorch_pretrained_bert.tokenization import BertTokenizer
 from pytorch_pretrained_bert.modeling import BertConfig
-from downstream_tasks.run_classifier import BertForMultiLabelSequenceClassification
+from downstream_tasks.run_classifier import BertForMultiLabelSequenceClassification, BertForSequenceClassification
 current_path = os.path.dirname(__file__)
 import seaborn as sns
 sns.set_style('white')
@@ -52,17 +52,25 @@ def get_attention_scores(model, i, text):
     return attention_probs, tokenized
 
 # ===============================
-# bert_config  = BertConfig(os.path.join(current_path, 'downstream_tasks', 'output', 'carotid', 'sb_all_0', 'config.json'))
-# tokenizer = BertTokenizer.from_pretrained(os.path.join(current_path, 'models', 'strokeBERT_biobased_all_150000'), do_lower_case=False)
-
-bert_config  = BertConfig(os.path.join(current_path, 'downstream_tasks', 'output', 'restroke_all', 'sb_all_0', 'config.json'))
-tokenizer = BertTokenizer.from_pretrained(os.path.join(current_path, 'models', 'biobert_v1.0_pubmed_pmc'), do_lower_case=False)
-
-model = BertForMultiLabelSequenceClassification(bert_config, num_labels=17)
+tokenizer = BertTokenizer.from_pretrained(os.path.join(current_path, 'models', 'strokeBERT_biobased_all_150000'), do_lower_case=False)
+# tokenizer = BertTokenizer.from_pretrained(os.path.join(current_path, 'models', 'biobert_v1.0_pubmed_pmc'), do_lower_case=False)
 # tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
 
+
+# bert_config  = BertConfig(os.path.join(current_path, 'downstream_tasks', 'output', 'carotid', 'sb_all_0', 'config.json'))
+# model = BertForMultiLabelSequenceClassification(bert_config, num_labels=17)
+
+bert_config  = BertConfig(os.path.join(current_path, 'downstream_tasks', 'output', 'restroke_all', 'sb_all_0', 'config.json'))
+model = BertForSequenceClassification(bert_config, num_labels=2)
+
+
+
+
+
+
 # text ='significant stenosis at right MCA M1 segment and right distal VA'
-text = "This is a male with past history of old CVA with Lt weakness 5 years ago. HTN with OPD medication control for 5 years. He became totally recovered without neurologic deficit after the old CVA."
+# text = "This is a male with past history of old CVA with Lt weakness 5 years ago. HTN with OPD medication control for 5 years. He became totally recovered without neurologic deficit after the old CVA."
+text = "This is a male with past history of old CVA with Lt weakness 5 years ago."
 x, tokens = get_attention_scores(model, 0, text)
 
 map1=np.asarray(x[0][1].detach().numpy())
