@@ -81,7 +81,7 @@ plt.clf()
 f=plt.figure(figsize=(10,10))
 ax = f.add_subplot(1,1,1)
 i=ax.imshow(map1, interpolation='nearest', cmap='Purples')
-# f.colorbar(i, ax=ax)
+f.colorbar(i, ax=ax)
 
 ax.set_yticks(range(len(tokens)))
 ax.set_yticklabels(tokens)
